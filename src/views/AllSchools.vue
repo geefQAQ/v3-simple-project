@@ -2,79 +2,27 @@
   <!-- nav -->
   <van-nav-bar
     title="全部学校"
-    @click-right="onClickRight"
-  >
-    <template #right>
-      <div class="nav-right-wrapper">
-        <van-icon name="search" size="18" />
-        <span class="nav-right-text">查询</span>
-      </div>
-    </template>
-  </van-nav-bar>
+  />
 
   <!-- 考勤概况 -->
-  <div class="attendance-overview">
-    <div class="attendance-card">
-      <van-cell title-class="" title="测试学校" size="large">
-        <template #label>
-          <van-cell :border="false" class="label-text" title="考勤时间:2023-03-31" icon="notes-o"></van-cell>
-          <van-cell :border="false" class="label-text" title="考勤时段:上午上学" icon="clock-o"></van-cell>
-        </template>
-      </van-cell>
-    </div>
-
-    <Bar/>
-
-    <!-- <van-circle
-      class="attendance-circle"
-      v-model:current-rate="currentRate"
-      size="120"
-      :rate="rate"
-      :color="gradientColor"
-    >
-      <template #default>
-        <div class="circle-text">
-          <div>0/158</div>
-          <div>应到/实到</div>
-          <div>出勤率: 0%</div>
-        </div>
-      </template>
-    </van-circle> -->
-
-    <!-- 两端对齐 -->
-    <!-- 封装成组件 [{key:value}, {}] -->
-    <!-- <van-row class="attendance-stat" justify="space-between">
-      <van-col span="4">
-        <div>
-          <p>158</p>
-          <p>总人数</p>
-        </div>
-      </van-col>
-      <van-col span="4">
-        <div>
-          <p>1</p>
-          <p>请假</p>
-        </div>
-      </van-col>
-      <van-col span="4">
-        <div>
-          <p>157</p>
-          <p>缺勤</p>
-        </div>
-      </van-col>
-      <van-col span="4">
-        <div>
-          <p>0</p>
-          <p>迟到</p>
-        </div>
-      </van-col>
-      <van-col span="4">
-        <div>
-          <p>0</p>
-          <p>正常</p>
-        </div>
-      </van-col>
-    </van-row> -->
+  <div class="card">
+    <van-cell
+      title="查询日期"
+      is-link
+      arrow-direction="down"
+      icon="notes-o"
+      :value="currentDate"
+      @click="showDateTime = true"
+    />
+    <van-cell
+      title="考勤时段"
+      is-link
+      arrow-direction="down"
+      icon="clock-o"
+      :value="currentRange"
+      @click="showPicker = true"
+    />
+    <Bar />
   </div>
 
   <div class="table-header">
@@ -157,15 +105,19 @@ import { ref, computed } from 'vue';
 import { Toast } from 'vant';
 import dayjs from "dayjs";
 import Bar from '@/components/Bar.vue';
-
+import { getTestApi } from '@/api'
 const router = useRouter();
 
-const currentRate = ref(0);
-const rate = ref(90);
-const gradientColor = {
-  '0%': '#3fecff',
-  '100%': '#6149f6',
-};
+getTestApi().then(data => {
+  console.log('data', data)
+});
+
+// const currentRate = ref(0);
+// const rate = ref(90);
+// const gradientColor = {
+//   '0%': '#3fecff',
+//   '100%': '#6149f6',
+// };
 // datetime
 const now = new Date();
 const currentDate = computed(() => {
@@ -204,7 +156,7 @@ const onChange = () => {
 const tableData = ref([
   {
     id: "1",
-    grade: "一年级",
+    grade: "学校A",
     shouldIn: "28",
     arrive: "0(0/0)",
     absence: '0/28',
@@ -212,7 +164,7 @@ const tableData = ref([
   },
   {
     id: "2",
-    grade: "二年级",
+    grade: "学校B",
     shouldIn: "28",
     arrive: "0(0/0)",
     absence: '0/28',
@@ -220,7 +172,7 @@ const tableData = ref([
   },
   {
     id: "3",
-    grade: "三年级",
+    grade: "学校C",
     shouldIn: "28",
     arrive: "0(0/0)",
     absence: '0/28',
@@ -246,9 +198,9 @@ const handleCellClick = (cell) => {
 
 // search dialog
 const showSearchDialog = ref(false);
-const onClickRight = () => {
-  showSearchDialog.value = true;
-}
+// const onClickRight = () => {
+//   showSearchDialog.value = true;
+// }
 const doSearch = () => {
   Toast.loading({
     message: '加载中...',
@@ -341,4 +293,11 @@ const doSearch = () => {
   text-align: center;
 }
 
+.card {
+  margin: 12px;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 12px #ebedf0;
+  overflow: hidden;
+}
 </style>

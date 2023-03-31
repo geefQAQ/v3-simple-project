@@ -35,7 +35,7 @@ let option = {
     left:"30%",
     top:"50%",
     textStyle:{
-      color:"#27D9C8",
+      // color:"#27D9C8",
       fontSize:16,
       align:"center"
     }
@@ -60,7 +60,7 @@ let option = {
     left:"25%",
     top:"45%",
     style:{
-      text:"运动达标率",
+      text:"今日出勤率",
       textAlign:"center",
       fill:"#333",
       fontSize:14,

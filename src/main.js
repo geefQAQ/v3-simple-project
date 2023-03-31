@@ -6,6 +6,7 @@ import {
   Button,
   NavBar,
   Cell,
+  CellGroup,
   Icon,
   Circle,
   Col,
@@ -38,7 +39,7 @@ const app = createApp(App);
 // }
 // 3. 注册你需要的组件
 app
-  .use(Button).use(NavBar).use(Cell).use(Icon)
+  .use(Button).use(NavBar).use(Cell).use(CellGroup).use(Icon)
   .use(Circle).use(Col).use(Row).use(Collapse).use(CollapseItem)
   .use(Toast).use(Popup).use(DatetimePicker).use(Picker).use(Field).use(Dialog);
 
