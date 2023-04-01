@@ -6,14 +6,33 @@
 
   <!-- 考勤概况 -->
   <div class="card">
+    <!-- TODO： cell popup picker封装 -->
     <van-cell
       title="查询日期"
       is-link
+      readonly
       arrow-direction="down"
       icon="notes-o"
-      :value="currentDate"
-      @click="showDateTime = true"
+      :value="displayDate"
+      @click="showDatePicker = true"
     />
+    <van-popup
+      v-model:show="showDatePicker"
+      @closed="showDatePicker = false"
+      position="bottom"
+      teleport="body"
+      round
+    >
+      <van-datetime-picker
+        v-model="currentDate"
+        type="date"
+        title="请选择查询日期"
+        :min-date="minDate"
+        :max-date="now"
+        @confirm="handleConfirmDate"
+        @cancel="showDatePicker = false"
+      />
+    </van-popup>
     <van-cell
       title="考勤时段"
       is-link
@@ -22,6 +41,20 @@
       :value="currentRange"
       @click="showPicker = true"
     />
+    <van-popup
+      v-model:show="showPicker"
+      @closed="showPicker = false"
+      position="bottom"
+      round
+      teleport="body"
+    >
+      <van-picker
+        title="请选择考勤时段"
+        :columns="rangeColumns"
+        @confirm="handleConfirmPicker"
+        @cancel="showPicker = false"
+      />
+    </van-popup>
     <Bar />
   </div>
 
@@ -37,101 +70,40 @@
     :data="tableData"
     @cell-click="handleCellClick"
   >
-    <vxe-column field="grade" title="年级"></vxe-column>
-    <vxe-column field="shouldIn" title="应到"></vxe-column>
-    <vxe-column field="arrive" title="实到(正常/迟到)"></vxe-column>
-    <vxe-column field="absence" title="请假/缺勤"></vxe-column>
-    <vxe-column field="rollCall" title="点名情况"></vxe-column>
+    <vxe-column field="SchoolName" title="学校名称"></vxe-column>
+    <vxe-column field="Total" title="应到"></vxe-column>
+    <vxe-column field="Actually" title="实到(正常/迟到)" width="30%"></vxe-column>
+    <vxe-column field="Absent" title="请假/缺勤"></vxe-column>
   </vxe-table>
-
-  <van-popup
-    v-model:show="showDateTime"
-    @closed="showDateTime = false"
-    position="bottom"
-    round
-  >
-    <van-datetime-picker
-      v-model="now"
-      type="date"
-      title="查询日期"
-      :min-date="minDate"
-      :max-date="maxDate"
-    />
-  </van-popup>
-
-  <van-popup
-    v-model:show="showPicker"
-    @closed="showPicker = false"
-    position="bottom"
-    round
-  >
-    <van-picker
-      title="考勤时段"
-      :columns="columns"
-      @confirm="onConfirm"
-      @cancel="onCancel"
-      @change="onChange"
-    />
-  </van-popup>
-
-  <!-- search dialog -->
-  <van-dialog
-    v-model:show="showSearchDialog"
-    title="查询"
-    show-cancel-button
-    confirm-button-text="查询"
-    @confirm="doSearch"
-  >
-    <van-cell
-      title="查询日期"
-      is-link
-      arrow-direction="down"
-      :value="currentDate"
-      @click="showDateTime = true"
-    />
-    <van-cell
-      title="考勤时段"
-      is-link
-      arrow-direction="down"
-      :value="currentRange"
-      @click="showPicker = true"
-    />
-  </van-dialog>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { Toast } from 'vant';
 import dayjs from "dayjs";
 import Bar from '@/components/Bar.vue';
 import { getTestApi } from '@/api'
 const router = useRouter();
 
-getTestApi().then(data => {
-  console.log('data', data)
-});
-
-// const currentRate = ref(0);
-// const rate = ref(90);
-// const gradientColor = {
-//   '0%': '#3fecff',
-//   '100%': '#6149f6',
-// };
-// datetime
-const now = new Date();
-const currentDate = computed(() => {
-  return dayjs(now).format("YYYY-MM-DD")
-})
-
-const minDate = new Date(2020, 0, 1);
-const maxDate = new Date(2025, 10, 1);
-
-const showDateTime = ref(false);
+// table-data
+const tableData = ref([]);
+const getTableData = () => {
+  getTestApi().then(res => {
+    const { data } = res;
+    tableData.value = data;
+  });
+}
+getTableData();
 
 // picker
+const now = new Date();
+const currentDate = ref(new Date());
+const displayDate = ref(dayjs(new Date()).format("YYYY-MM-DD"));
+const minDate = new Date(2020, 0, 1);
+const showDatePicker = ref(false);
 const showPicker = ref(false);
-const columns = [
+const rangeColumns = [
   '上午上学',
   '上午放学',
   '下午上学',
@@ -139,46 +111,21 @@ const columns = [
   '晚修上学',
   '晚修放学',
 ];
-const currentRange = columns[0];
-const onConfirm = () => {
-
+const currentRange = ref(rangeColumns[0]);
+const handleConfirmPicker = (value) => {
+  currentRange.value = value;
+  showPicker.value = false;
 }
-const onCancel = () => {
+const handleConfirmDate = (value) => {
+  showDatePicker.value = false;
+  currentDate.value = value;
+  displayDate.value = dayjs(value).format("YYYY-MM-DD");
 
+  // TODO: api
+  getTableData();
 }
-const onChange = () => {
-
-}
-
-
 
 // table
-const tableData = ref([
-  {
-    id: "1",
-    grade: "学校A",
-    shouldIn: "28",
-    arrive: "0(0/0)",
-    absence: '0/28',
-    rollCall: '0/3'
-  },
-  {
-    id: "2",
-    grade: "学校B",
-    shouldIn: "28",
-    arrive: "0(0/0)",
-    absence: '0/28',
-    rollCall: '0/3'
-  },
-  {
-    id: "3",
-    grade: "学校C",
-    shouldIn: "28",
-    arrive: "0(0/0)",
-    absence: '0/28',
-    rollCall: '0/3'
-  },
-]);
 const tableLoading = ref(false);
 const handleRefreshTable = () => {
   tableLoading.value = true;
@@ -190,17 +137,11 @@ const handleRefreshTable = () => {
   }, 2000)
 }
 
-const handleCellClick = (cell) => {
-  const { row } = cell;
-  const schoolId = row?.id;
-  router.push({ name: 'school', params: { schoolId }, query: { title: 'testtitle' } })
+const handleCellClick = ({ row }) => {
+  const { SchoolName: schoolName, SchoolCode: schoolId } = row;
+  router.push({ name: 'school', params: { schoolId }, query: { title: schoolName } })
 }
 
-// search dialog
-const showSearchDialog = ref(false);
-// const onClickRight = () => {
-//   showSearchDialog.value = true;
-// }
 const doSearch = () => {
   Toast.loading({
     message: '加载中...',
@@ -225,32 +166,25 @@ const doSearch = () => {
     left: 10px;
     top: 50%;
     transform: translateY(-50%);
-    height: 20px;
-    width: 6px;
+    height: 18px;
+    width: 3px;
     border-radius: 3px;
     background-color: blue;
   }
   &:deep(.van-button--default) {
     border: none;
   }
-}
-.table-title {
-  padding-left: 30px;
-}
-
-// .table-body > tr:nth-child(odd){
-//   background: #eee;
-// }
-
-.nav-right-wrapper {
-  display: flex;
-  align-items: center;
+  .table-title {
+    padding-left: 23px;
+  }
 }
 
-.nav-right-text {
-  font-size: 14px;
-  color: var(--van-nav-bar-icon-color);
-  padding-left: 2px;
+.card {
+  margin: 12px;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 12px #ebedf0;
+  overflow: hidden;
 }
 
 .attendance-overview {
@@ -293,11 +227,5 @@ const doSearch = () => {
   text-align: center;
 }
 
-.card {
-  margin: 12px;
-  background-color: #fff;
-  border-radius: 20px;
-  box-shadow: 0 8px 12px #ebedf0;
-  overflow: hidden;
-}
+
 </style>
