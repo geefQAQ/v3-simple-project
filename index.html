@@ -8,6 +8,297 @@
   </head>
   <body>
     <div id="app"></div>
+    <style>
+      /* .app-loading {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: #f4f7f9;
+      }
+
+      .app-loading .app-loading-wrap {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        display: flex;
+        transform: translate3d(-50%, -50%, 0);
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .app-loading .dots {
+        display: flex;
+        padding: 98px;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .app-loading .app-loading-title {
+        display: flex;
+        margin-top: 30px;
+        font-size: 30px;
+        color: rgb(0 0 0 / 85%);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .app-loading .app-loading-logo {
+        display: block;
+        width: 90px;
+        margin: 0 auto;
+        margin-bottom: 20px;
+      }
+
+      .dot {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 48px;
+        margin-top: 30px;
+        font-size: 32px;
+        transform: rotate(45deg);
+        box-sizing: border-box;
+        animation: antRotate 1.2s infinite linear;
+      }
+
+      .dot i {
+        position: absolute;
+        display: block;
+        width: 20px;
+        height: 20px;
+        background-color: #0065cc;
+        border-radius: 100%;
+        opacity: 30%;
+        transform: scale(0.75);
+        animation: antSpinMove 1s infinite linear alternate;
+        transform-origin: 50% 50%;
+      }
+
+      .dot i:nth-child(1) {
+        top: 0;
+        left: 0;
+      }
+
+      .dot i:nth-child(2) {
+        top: 0;
+        right: 0;
+        animation-delay: 0.4s;
+      }
+
+      .dot i:nth-child(3) {
+        right: 0;
+        bottom: 0;
+        animation-delay: 0.8s;
+      }
+
+      .dot i:nth-child(4) {
+        bottom: 0;
+        left: 0;
+        animation-delay: 1.2s;
+      }
+      @keyframes antRotate {
+        to {
+          transform: rotate(405deg);
+        }
+      }
+      @keyframes antRotate {
+        to {
+          transform: rotate(405deg);
+        }
+      }
+      @keyframes antSpinMove {
+        to {
+          opacity: 100%;
+        }
+      }
+      @keyframes antSpinMove {
+        to {
+          opacity: 100%;
+        }
+      } */
+
+      #slack {
+        position: relative;
+        z-index: 100;
+        margin: 40vh auto;
+        width: 96px;
+        height: 96px;
+        /* background: #f5f5f5; */
+        transform: rotate(-15deg);
+      }
+
+      .slack-dot {
+        display: block;
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-radius: 9px;
+        mix-blend-mode: multiply;
+      }
+
+      .slack-dot--a {
+        top: 0;
+        left: 0;
+        background-color: #3eb991;
+        animation: slack-animation--a 2s infinite;
+        transform: translateX(18px);
+      }
+
+      .slack-dot--b {
+        top: 0;
+        right: 0;
+        background-color: #6ecadc;
+        animation: slack-animation--b 2s infinite;
+        transform: translateY(18px);
+      }
+
+      .slack-dot--c {
+        bottom: 0;
+        right: 0;
+        background-color: #e9a820;
+        animation: slack-animation--c 2s infinite;
+        transform: translateX(-18px);
+      }
+
+      .slack-dot--d {
+        bottom: 0;
+        left: 0;
+        background-color: #e01563;
+        animation: slack-animation--d 2s infinite;
+        transform: translateY(-18px);
+      }
+
+      @keyframes slack-animation--a {
+        0% {
+          top: 0;
+          bottom: auto;
+          height: 18px;
+        }
+        33% {
+          top: 0;
+          bottom: auto;
+          height: 96px;
+        }
+        34% {
+          top: auto;
+          bottom: 0;
+          height: 96px;
+        }
+        66% {
+          top: auto;
+          bottom: 0;
+          height: 18px;
+        }
+        100% {
+          top: auto;
+          bottom: 78px;
+          height: 18px;
+        }
+      }
+
+      @keyframes slack-animation--b {
+        0% {
+          right: 0;
+          left: auto;
+          width: 18px;
+        }
+        33% {
+          right: 0;
+          left: auto;
+          width: 96px;
+        }
+        34% {
+          right: auto;
+          left: 0;
+          width: 96px;
+        }
+        66% {
+          right: auto;
+          left: 0;
+          width: 18px;
+        }
+        100% {
+          right: auto;
+          left: 78px;
+          width: 18px;
+        }
+      }
+
+      @keyframes slack-animation--c {
+        0% {
+          bottom: 0;
+          top: auto;
+          height: 18px;
+        }
+        33% {
+          bottom: 0;
+          top: auto;
+          height: 96px;
+        }
+        34% {
+          bottom: auto;
+          top: 0px;
+          height: 96px;
+        }
+        66% {
+          bottom: auto;
+          top: 0px;
+          height: 18px;
+        }
+        100% {
+          bottom: auto;
+          top: 78px;
+          height: 18px;
+        }
+      }
+
+      @keyframes slack-animation--d {
+        0% {
+          left: 0;
+          right: auto;
+          width: 18px;
+        }
+        33% {
+          left: 0;
+          right: auto;
+          width: 96px;
+        }
+        34% {
+          left: auto;
+          right: 0px;
+          width: 96px;
+        }
+        66% {
+          left: auto;
+          right: 0px;
+          width: 18px;
+        }
+        100% {
+          left: auto;
+          right: 78px;
+          width: 18px;
+        }
+      }
+
+    </style>
+      <!-- <div class="app-loading">
+        <div class="app-loading-wrap">
+          <div class="app-loading-dots">
+            <span class="dot dot-spin"><i></i><i></i><i></i><i></i></span>
+          </div>
+          <div class="app-loading-title"><%= title %></div>
+        </div>
+      </div> -->
+      <div id="slack">
+        <span class="slack-dot slack-dot--a"></span>
+        <span class="slack-dot slack-dot--b"></span>
+        <span class="slack-dot slack-dot--c"></span>
+        <span class="slack-dot slack-dot--d"></span>
+      </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

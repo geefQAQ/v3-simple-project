@@ -7,3 +7,7 @@ hooks
 打包
 
 echarts
+
+首屏loading
+
+路由跳转动画

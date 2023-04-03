@@ -2,12 +2,20 @@ import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite';
 import { createStyleImportPlugin, VxeTableResolve } from 'vite-plugin-style-import';
-import { viteMockServe } from 'vite-plugin-mock'
+import { viteMockServe } from 'vite-plugin-mock';
+import { createHtmlPlugin } from 'vite-plugin-html';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    createHtmlPlugin({
+      inject: {
+        data: {
+          title: 'testTitle',
+        }
+      }
+    }),
     createStyleImportPlugin({
       resolves: [
         VxeTableResolve()
