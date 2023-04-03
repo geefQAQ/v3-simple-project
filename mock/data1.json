@@ -1,0 +1,53 @@
+[
+  {
+    "Date": "2023-3-31",
+    "GradeId": "1004",
+    "ClassId": "",
+    "Time": "下午上学",
+    "SchoolCode": "0001",
+    "SchoolName": "测试学校",
+    "GradeName": "一年级",
+    "ClassName": "",
+    "Access": 0,
+    "Late": 0,
+    "Absent": 28,
+    "Holiday": 0,
+    "Total": 28,
+    "Actually": 0,
+    "Rate": "0%"
+  },
+  {
+    "Date": "2023-3-31",
+    "GradeId": "1005",
+    "ClassId": "",
+    "Time": "下午上学",
+    "SchoolCode": "0001",
+    "SchoolName": "测试学校",
+    "GradeName": "二年级",
+    "ClassName": "",
+    "Access": 0,
+    "Late": 0,
+    "Absent": 13,
+    "Holiday": 0,
+    "Total": 13,
+    "Actually": 0,
+    "Rate": "0%"
+  },
+  {
+    "Date": "2023-3-31",
+    "GradeId": "2413",
+    "ClassId": "",
+    "Time": "下午上学",
+    "SchoolCode": "0001",
+    "SchoolName": "测试学校",
+    "GradeName": "三年级",
+    "ClassName": "",
+    "Access": 0,
+    "Late": 0,
+    "Absent": 19,
+    "Holiday": 0,
+    "Total": 19,
+    "Actually": 0,
+    "Rate": "0%"
+  }
+]

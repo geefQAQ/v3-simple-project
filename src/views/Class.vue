@@ -4,76 +4,188 @@
     left-arrow
     @click-left="onClickLeft"
   />
-  <van-collapse v-model="activeNames">
-    <van-collapse-item name="1">
-      <template #title>
-        <div class="title-wrapper">
-          <div class="icon-wrapper">
-            <van-icon name="friends" color="#fff" size="20"/>
-          </div>
-          <span>缺勤20人</span>
-        </div>
-      </template>
-      <template #default>
-        <van-row justify="space-between">
-          <van-col @click="show = true" span="12">span: 6</van-col>
-          <van-col span="12">span: 6</van-col>
-        </van-row>
-        <van-row justify="space-between">
-          <van-col span="12">span: 6</van-col>
-          <van-col span="12">span: 6</van-col>
-        </van-row>
-        <van-row justify="space-between">
-          <van-col span="12">span: 6</van-col>
-          <van-col span="12">span: 6</van-col>
-        </van-row>
-      </template>
-    </van-collapse-item>
-    <van-collapse-item title="标题2" name="2">
-      技术无非就是那些开发它的人的共同灵魂。
-    </van-collapse-item>
-    <van-collapse-item title="标题3" name="3">
-      在代码阅读过程中人们说脏话的频率是衡量代码质量的唯一标准。
-    </van-collapse-item>
-  </van-collapse>
 
+  <Search
+    @confirm-date="handleConfirmDate"
+    @confirm-range="handleConfirmRange"
+  >
+    <template v-slot:chart>
+      <Bar :data="barData"/>
+    </template>
+  </Search>
+
+  <div class="card">
+    <van-collapse v-model="activeNames">
+      <van-collapse-item
+        v-for="(value, key) in state.listType"
+        :title="`${CLASS_OBJ[key].chnName} ${value.length} 人`"
+        :name="key"
+      >
+        <template #icon>
+          <div class="icon-wrapper" :class="CLASS_OBJ[key].className">
+            <van-icon name="friends" color="#fff" class="collapse-icon"/>
+          </div>
+        </template>
+        <template #default>
+          <van-space wrap size="20">
+            <!-- <van-button
+              v-for="(student, index) in value"
+              :key="index"
+              round plain type="primary">
+              {{ student.StudentName }}
+            </van-button> -->
+            <van-tag
+              v-for="(student, index) in value"
+              :key="index"
+              type="primary"
+              plain
+              round
+              size="large"
+              @click="showPopup = true"
+            >{{ student.StudentName }}</van-tag>
+          </van-space>
+        </template>
+      </van-collapse-item>
+    </van-collapse>
+
+  </div>
   <van-popup
-    v-model:show="show"
+    v-model:show="showPopup"
     :style="{ height: '50%', width: '80%' }"
     round
   >
-    hihi
+    'test'
   </van-popup>
 
 </template>
 
 <script setup>
-  import { useRouter, useRoute } from 'vue-router';
-  import { ref } from 'vue';
-  const router = useRouter();
-  const route = useRoute();
-  const { title } = route.query ?? '';
-  const activeNames = ref(['1']);
-  const show = ref(false);
-  // console.log(`output->route`,route.query)
-  const onClickLeft = () => {
-    router.back();
+import { useRouter, useRoute } from 'vue-router';
+import { ref, reactive, computed } from 'vue';
+import Bar from '@/components/Bar.vue';
+import Search from '@/components/Search.vue';
+import { getStudentsByClassId } from '@/api';
+
+const router = useRouter();
+const route = useRoute();
+
+const studentList = ref([]);
+// const CLASS_OBJ = [
+//   {
+//     className: '',
+//     chnName: '',
+
+//   }
+// ]
+const CLASS_OBJ = {
+  'absentList': {
+    className: 'is-absent',
+    chnName: '缺勤'
+  },
+  'holidayList': {
+    className: 'is-holiday',
+    chnName: '请假'
+  },
+  'lateList': {
+    className: 'is-late',
+    chnName: '迟到'
+  },
+  'normalList': {
+    className: 'is-normal',
+    chnName: '正常'
   }
+}
+const state = reactive({
+  allStudentList: [],
+  listType: {
+    absentList: [],
+    holidayList: [],
+    lateList: [],
+    normalList: [],
+  }
+})
+
+state.listType.absentList = computed(() => {
+  return state.allStudentList.filter(i => i.IsAbsent === '1');
+})
+state.listType.holidayList = computed(() => {
+  return state.allStudentList.filter(i => i.IsHoliday === '1');
+})
+state.listType.lateList = computed(() => {
+  return state.allStudentList.filter(i => i.IsLate === '1');
+})
+state.listType.normalList = computed(() => {
+  return state.allStudentList.filter(i => i.IsNormal === '1');
+})
+const init = () => {
+  const { classId } = route.params;
+  getStudentsByClassId(classId).then(res => {
+    console.log(`output->res`,res)
+    state.allStudentList = res.data;
+    // setTimeout(() => {
+    // }, 500)
+  }).finally(() => {
+    // state.tableLoading = false;
+  })
+};
+init();
+
+const { title } = route.query ?? '';
+const activeNames = ref(['1']);
+const show = ref(false);
+// console.log(`output->route`,route.query)
+const onClickLeft = () => {
+  router.back();
+}
+
+
+const handleConfirmDate = () => {
+
+}
+const handleConfirmRange= () => {
+}
+const barData = ref([])
+
+const showPopup = ref(false);
 </script>
 
 <style lang="scss" scoped>
-.title-wrapper {
-  display: flex;
+.card {
+  margin: 12px;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 12px #ebedf0;
+  overflow: hidden;
+
+  &:deep(.van-tag--large) {
+    padding:4px 16px;
+    margin: 8px 8px;
+  }
 }
 
 .icon-wrapper {
   height: 24px;
   width: 24px;
-  line-height: 24px;
-  background-color: #1989fa;
   border-radius: 50%;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+  color: #fff;
+  text-align: center;
+  margin-right: 8px;
+}
+
+.is-absent {
+  background: rgba(222, 110, 107);
+}
+.is-late {
+  background: rgba(250, 221,116);
+}
+.is-holiday {
+  background: rgba(91, 111, 192);
+}
+.is-normal {
+  background: rgba(158, 202, 127);
+}
+.collapse-icon {
+  font-size: 16px;
+  line-height: 24px;
 }
 </style>

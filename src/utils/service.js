@@ -16,7 +16,6 @@ function createService() {
   // 响应拦截（可根据具体业务作出相应的调整）
   service.interceptors.response.use(
     (response) => {
-      console.log(`output->response`,response)
       // apiData 是 API 返回的数据
       const apiData = response.data
       // 这个 Code 是和后端约定的业务 Code
