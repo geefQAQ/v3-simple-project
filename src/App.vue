@@ -2,12 +2,31 @@
 import { RouterView } from 'vue-router';
 import { onMounted, nextTick } from 'vue';
 onMounted(() => {
+  const loadingEle = document.querySelector('#slack');
   nextTick(() => {
-    document.querySelector('#slack').remove();
+    loadingEle && loadingEle.remove();
   })
 })
 </script>
 
 <template>
-  <RouterView />
+  <router-view v-slot="{ Component, route }">
+    <transition name="fade">
+      <component :is="Component" :key="route.path" />
+    </transition>
+  </router-view>
 </template>
+
+<style lang="scss" scoped>
+.fade-enter-active{
+  transition: opacity 0.2s ease;
+}
+//把离开时的开始状态设置为display:none
+.fade-leave-from{
+  display: none;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

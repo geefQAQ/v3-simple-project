@@ -34,3 +34,10 @@ export function getStudentsByClassId(classId) {
     method: "get"
   })
 }
+
+export function getAttendanceByToday(dateStr) {
+  return request({
+    url: `/mock/attendance/${dateStr}`,
+    method: "get"
+  })
+}

@@ -1,4 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
+import { start, close } from '@/utils/nprogress';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,7 +12,7 @@ const router = createRouter({
     {
       path: '/all-schools',
       name: 'allSchools',
-      component: () => import('@views/AllSchools.vue')
+      component: () => import('@views/AllSchools/index.vue')
     },
     {
       path: '/school/:schoolId',
@@ -31,4 +32,12 @@ const router = createRouter({
   ]
 })
 
-export default router
+router.beforeEach(() => {
+  start();
+});
+
+router.afterEach(() => {
+  close();
+})
+
+export default router;

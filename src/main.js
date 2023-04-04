@@ -23,6 +23,7 @@ import {
   Tabs,
   Tag,
   Space,
+  Divider,
 } from 'vant';
 
 import {
@@ -46,6 +47,7 @@ app
   .use(Button).use(NavBar).use(Cell).use(CellGroup).use(Icon)
   .use(Circle).use(Col).use(Row).use(Collapse).use(CollapseItem)
   .use(Toast).use(Popup).use(DatetimePicker).use(Picker).use(Field).use(Dialog).use(Tag).use(Space)
+  .use(Divider)
   .use(Tab).use(Tabs);
 
 app.use(VXETable).use(VXEColumn);

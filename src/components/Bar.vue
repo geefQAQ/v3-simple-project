@@ -1,5 +1,12 @@
 <template>
-  <div id="chart" style="width: 90vw;height: 300px;"></div>
+  <div style="display: flex;">
+    <div id="bar" class="bar-wrapper"></div>
+    <div class="legend-wrapper">
+      <div v-for="(legend, index) in dataWidthTotal" :key="index">
+        <div class="legend-circle">{{ `${legend.name} : ${legend.value}` }}</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -8,8 +15,16 @@ import { TooltipComponent, LegendComponent, TitleComponent, GraphicComponent } f
 import { PieChart } from 'echarts/charts';
 import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
-import { onMounted } from 'vue';
+import { onMounted, onBeforeUnmount, ref } from 'vue';
 
+const props = defineProps({
+  data: {
+    type: Array,
+    default: () => []
+  }
+})
+
+// TODO: 封装
 echarts.use([
   TooltipComponent,
   LegendComponent,
@@ -19,60 +34,41 @@ echarts.use([
   CanvasRenderer,
   LabelLayout
 ]);
-onMounted(() => {
-  const myChart = echarts.init(document.getElementById('chart'));
+
+let myChart = null;
+const handleResize = () => {
+  myChart && myChart.clear();
   option && myChart.setOption(option);
+  myChart.resize();
+}
+onMounted(() => {
+  const bar = document.getElementById('bar');
+  myChart = echarts.init(bar);
+  handleResize();
+  // TODO: 可以加debounce，手机端先不加
+  window.addEventListener('resize', handleResize);
 })
-const data = [
-  { icon: 'circle', value: 1048, name: '请假' },
-  { icon: 'circle', value: 735, name: '缺勤' },
-  { icon: 'circle', value: 580, name: '迟到' },
-  { icon: 'circle', value: 484, name: '正常' },
-];
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+})
+const data = ref(props.data);
+const dataWidthTotal = [{value: 10000, name: '总人数'}, ...data.value]
 let option = {
   title:{
-    text:"80%",
-    left:"30%",
-    top:"50%",
+    text:"今日出勤率\n80%",
+    x: 'center',
+    y: 'center',
     textStyle:{
-      // color:"#27D9C8",
-      fontSize:16,
-      align:"center"
-    }
-  },
-  legend: {
-    top: '30%',
-    orient: 'vertical',
-    right: 'left',
-    selectedMode: false,
-    data: data,
-    formatter:function(name){
-      const idx = data.findIndex(item => item.name === name);
-      const value = data[idx]?.value;
-      return `${name}: ${value}`;
-    },
-    textStyle:{
-      fontSize: 14,
-    }
-  },
-  graphic:{
-    type:"text",
-    left:"25%",
-    top:"45%",
-    style:{
-      text:"今日出勤率",
-      textAlign:"center",
-      fill:"#333",
-      fontSize:14,
-      fontWeight:700
+      fontSize: 16,
+      align: 'center'
     }
   },
   series: [
     {
       name: 'Access From',
       type: 'pie',
-      center: ['35%', '50%'],
-      radius: ['40%', '70%'],
+      center: ['50%', '50%'],
+      radius: ['70%', '95%'],
       avoidLabelOverlap: false,
       itemStyle: {
         borderRadius: 10,
@@ -95,6 +91,36 @@ let option = {
     }
   ]
 };
-
-
 </script>
+
+<style lang="scss" scoped>
+.legend-circle {
+  position: relative;
+  padding-left: 20px;
+  margin-left: 20px;
+  &:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: lightcoral;
+  }
+}
+
+.bar-wrapper {
+  flex: 1;
+  height: 200px;
+}
+
+.legend-wrapper {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 40px 0;
+}
+</style>

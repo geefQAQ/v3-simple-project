@@ -1,61 +1,63 @@
 <template>
-  <van-nav-bar
-    :title="title"
-    left-arrow
-    @click-left="onClickLeft"
-  />
-
-  <Search
-    @confirm-date="handleConfirmDate"
-    @confirm-range="handleConfirmRange"
-  >
-    <template v-slot:chart>
-      <Bar :data="barData"/>
-    </template>
-  </Search>
-
-  <div class="card">
-    <van-collapse v-model="activeNames">
-      <van-collapse-item
-        v-for="(value, key) in state.listType"
-        :title="`${CLASS_OBJ[key].chnName} ${value.length} 人`"
-        :name="key"
-      >
-        <template #icon>
-          <div class="icon-wrapper" :class="CLASS_OBJ[key].className">
-            <van-icon name="friends" color="#fff" class="collapse-icon"/>
-          </div>
-        </template>
-        <template #default>
-          <van-space wrap size="20">
-            <!-- <van-button
-              v-for="(student, index) in value"
-              :key="index"
-              round plain type="primary">
-              {{ student.StudentName }}
-            </van-button> -->
-            <van-tag
-              v-for="(student, index) in value"
-              :key="index"
-              type="primary"
-              plain
-              round
-              size="large"
-              @click="showPopup = true"
-            >{{ student.StudentName }}</van-tag>
-          </van-space>
-        </template>
-      </van-collapse-item>
-    </van-collapse>
-
+  <div>
+    <van-nav-bar
+      :title="title"
+      left-arrow
+      @click-left="onClickLeft"
+    />
+  
+    <Search
+      @confirm-date="handleConfirmDate"
+      @confirm-range="handleConfirmRange"
+    >
+      <template v-slot:chart>
+        <Bar :data="barData"/>
+      </template>
+    </Search>
+  
+    <div class="card">
+      <van-collapse v-model="activeNames">
+        <van-collapse-item
+          v-for="(value, key) in state.listType"
+          :title="`${CLASS_OBJ[key].chnName} ${value.length} 人`"
+          :name="key"
+        >
+          <template #icon>
+            <div class="icon-wrapper" :class="CLASS_OBJ[key].className">
+              <van-icon name="friends" color="#fff" class="collapse-icon"/>
+            </div>
+          </template>
+          <template #default>
+            <van-space wrap size="20">
+              <!-- <van-button
+                v-for="(student, index) in value"
+                :key="index"
+                round plain type="primary">
+                {{ student.StudentName }}
+              </van-button> -->
+              <van-tag
+                v-for="(student, index) in value"
+                :key="index"
+                type="primary"
+                plain
+                round
+                size="large"
+                @click="showPopup = true"
+              >{{ student.StudentName }}</van-tag>
+            </van-space>
+          </template>
+        </van-collapse-item>
+      </van-collapse>
+  
+    </div>
+    <van-popup
+      v-model:show="showPopup"
+      :style="{ height: '50%', width: '80%' }"
+      round
+    >
+      'test'
+    </van-popup>
   </div>
-  <van-popup
-    v-model:show="showPopup"
-    :style="{ height: '50%', width: '80%' }"
-    round
-  >
-    'test'
-  </van-popup>
 
 </template>
 

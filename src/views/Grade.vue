@@ -1,29 +1,31 @@
 <template>
-  <van-nav-bar
-    :title="state.title"
-    left-text="返回"
-    left-arrow
-    @click-left="onClickLeft"
-  />
-  <Search
-    @confirm-date="handleConfirmDate"
-    @confirm-range="handleConfirmRange"
-  >
-    <template v-slot:chart>
-      <Bar :data="barData"/>
-    </template>
-  </Search>
+  <div>
+    <van-nav-bar
+      :title="state.title"
+      left-text="返回"
+      left-arrow
+      @click-left="onClickLeft"
+    />
+    <Search
+      @confirm-date="handleConfirmDate"
+      @confirm-range="handleConfirmRange"
+    >
+      <template v-slot:chart>
+        <Bar :data="barData"/>
+      </template>
+    </Search>
 
-  <!-- 表格 -->
-  <TableHeader>
-    <van-button icon="replay" @click="handleRefreshTable">刷新数据</van-button>
-  </TableHeader>
-  <BasicTable
-    :data="state.tableData"
-    :columns="TABLE_COLUMNS"
-    :loading="state.tableLoading"
-    @click-cell="handleClickCell"
-  />
+    <!-- 表格 -->
+    <GroupHeader>
+      <van-button icon="replay" @click="handleRefreshTable">刷新数据</van-button>
+    </GroupHeader>
+    <BasicTable
+      :data="state.tableData"
+      :columns="TABLE_COLUMNS"
+      :loading="state.tableLoading"
+      @click-cell="handleClickCell"
+    />
+  </div>
 </template>
 
 <script setup>
@@ -32,7 +34,7 @@ import { ref, reactive } from 'vue';
 import Bar from '@/components/Bar.vue';
 import Search from '@/components/Search.vue';
 import BasicTable from '@/components/BasicTable.vue';
-import TableHeader from '@/components/TableHeader.vue';
+import GroupHeader from '@/components/GroupHeader.vue';
 import { getClassesByGradeId } from '@/api';
 
 const router = useRouter();

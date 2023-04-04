@@ -3,6 +3,7 @@ import data1 from './data1.json';
 import gradeList from './gradeList.json';
 import classList from './classList.json';
 import studentList from './studentList.json';
+import attendanceToday from './attendanceToday.json';
 
 const allDistricts = [
   { id: '0', name: '桂一社区' },
@@ -87,6 +88,20 @@ const mockApi = [
         status : "ok",
         msg: "msg",
         data: studentList,
+        code: 0,
+      }
+    }
+  },
+  {
+    url: '/mock/attendance/:dateStr',
+    timeout: 100,
+    method: 'get',
+    response: ({ query }) => {
+      const { dateStr } = query;
+      return {
+        status : "ok",
+        msg: "msg",
+        data: attendanceToday,
         code: 0,
       }
     }
