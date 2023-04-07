@@ -4,6 +4,8 @@
       :title="title"
       left-arrow
       @click-left="onClickLeft"
+      @click-right="onClickRight"
+      right-text="返回首页"
     />
   
     <Search
@@ -138,6 +140,12 @@ const show = ref(false);
 // console.log(`output->route`,route.query)
 const onClickLeft = () => {
   router.back();
+}
+
+const onClickRight = () => {
+  router.replace({
+    name: 'home'
+  })
 }
 
 

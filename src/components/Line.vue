@@ -1,5 +1,10 @@
 <template>
+  <GroupHeader :title="props.title" />
   <div id="line" style="width: 100%; height: 240px;"></div>
+  <van-divider
+    dashed
+    :style="{ borderColor: '#5470c6', marginBottom: 0 }"
+  ></van-divider>
 </template>
 
 <script setup>
@@ -8,7 +13,8 @@ import { TitleComponent, GridComponent } from 'echarts/components';
 import { LineChart } from 'echarts/charts';
 import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
-import { onMounted, onBeforeUnmount } from 'vue';
+import { onMounted, onBeforeUnmount, watch, toRaw } from 'vue';
+import GroupHeader from '@/components/GroupHeader.vue';
 
 echarts.use([
   TitleComponent,
@@ -18,36 +24,51 @@ echarts.use([
   LabelLayout
 ]);
 
-let myChart = null;
-const handleResize = () => {
-  myChart && myChart.clear();
-  option && myChart.setOption(option);
-  myChart.resize();
-}
-onMounted(() => {
-  const line = document.getElementById('line');
-  myChart = echarts.init(line);
-  handleResize();
-  // TODO: 可以加debounce，手机端先不加
-  window.addEventListener('resize', handleResize);
+const props = defineProps({
+  title: {
+    type: String,
+    default: '',
+  },
+  data: {
+    type: Object,
+    default: () => {}
+  }
 })
+
+let myChart = null;
+
+watch(() => props.data, (newValue) => {
+  const { xAxisData, data } = toRaw(newValue);
+  option.xAxis.data = xAxisData;
+  option.series[0].data = data;
+  myChart && myChart.clear();
+  myChart.setOption(option);
+})
+
+onMounted(() => {
+  const lineEle = document.getElementById('line');
+  console.log(`output->mounted`)
+  myChart = echarts.init(lineEle);
+  option && myChart.setOption(option);
+})
+
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleResize);
+  console.log(`output->beforeUnmount`)
+  myChart.dispose();
 })
 
 const option = {
   xAxis: {
     type: 'category',
-    data: ['A', 'B', 'C']
+    axisTick: {
+      show: false
+    },
+    data: []
   },
   yAxis: {
     type: 'value'
   },
   grid: {
-    // x: '5%',
-    // y: '5%',
-    // width: '80%',
-    // height: '80%',
     top:'5%',
     left:'10%',
     right:'2%',
@@ -55,8 +76,12 @@ const option = {
   },
   series: [
     {
-      data: [120, 200, 150],
-      type: 'line'
+      type: 'line',
+      smooth: true,
+      emphasis: {
+        scale: false
+      },
+      data: []
     }
   ]
 };
