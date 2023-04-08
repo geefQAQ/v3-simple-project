@@ -6,6 +6,7 @@
       @click-left="onClickLeft"
       @click-right="onClickRight"
       right-text="返回首页"
+      safe-area-inset-top
     />
   
     <Search

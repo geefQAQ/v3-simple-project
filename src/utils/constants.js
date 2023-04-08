@@ -11,3 +11,5 @@ export const COLORS = {
   normal: '#ee6666',
   all: '#73c0de'
 }
+
+export const SCREEN_WIDTH = document.documentElement.clientWidth;

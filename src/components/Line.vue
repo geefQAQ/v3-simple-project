@@ -1,6 +1,8 @@
 <template>
   <GroupHeader :title="props.title" />
-  <div id="line" style="width: 100%; height: 240px;"></div>
+  <div ref="wrapperEle">
+    <div ref="lineEle" :style="{width: `${state.chartWidth}px`, height: `${state.chartHeight}px`}"></div>
+  </div>
   <van-divider
     dashed
     :style="{ borderColor: '#5470c6', marginBottom: 0 }"
@@ -9,15 +11,15 @@
 
 <script setup>
 import * as echarts from 'echarts/core';
-import { TitleComponent, GridComponent } from 'echarts/components';
+import { GridComponent } from 'echarts/components';
 import { LineChart } from 'echarts/charts';
 import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
-import { onMounted, onBeforeUnmount, watch, toRaw } from 'vue';
+import { onMounted, onBeforeUnmount, reactive, shallowRef,computed, watch, ref, toRaw, nextTick } from 'vue';
 import GroupHeader from '@/components/GroupHeader.vue';
+import { SCREEN_WIDTH } from '@/utils/constants';
 
 echarts.use([
-  TitleComponent,
   GridComponent,
   LineChart,
   CanvasRenderer,
@@ -33,28 +35,6 @@ const props = defineProps({
     type: Object,
     default: () => {}
   }
-})
-
-let myChart = null;
-
-watch(() => props.data, (newValue) => {
-  const { xAxisData, data } = toRaw(newValue);
-  option.xAxis.data = xAxisData;
-  option.series[0].data = data;
-  myChart && myChart.clear();
-  myChart.setOption(option);
-})
-
-onMounted(() => {
-  const lineEle = document.getElementById('line');
-  console.log(`output->mounted`)
-  myChart = echarts.init(lineEle);
-  option && myChart.setOption(option);
-})
-
-onBeforeUnmount(() => {
-  console.log(`output->beforeUnmount`)
-  myChart.dispose();
 })
 
 const option = {
@@ -85,4 +65,51 @@ const option = {
     }
   ]
 };
+
+const lineEle = ref();
+const wrapperEle = ref();
+// FIXED: vue3代理产生的问题 Cannot read properties of undefined (reading 'type')
+const chartIns = shallowRef();
+const state = reactive({
+  lineEle,
+  wrapperEle,
+  chartIns,
+  chartWidth: SCREEN_WIDTH - 24,
+  chartHeight: computed(() => state.chartWidth * 0.6)
+})
+
+const updateChartOption = () => {
+  const { xAxisData, data } = toRaw(props.data);
+  option.xAxis.data = xAxisData;
+  option.series[0].data = data;
+}
+
+const initChart = () => {
+  state.chartIns && state.chartIns.clear();
+  nextTick(() => {
+    state.chartWidth = state.wrapperEle.clientWidth;
+    state.chartIns = state.chartIns || echarts.init(state.lineEle);
+    updateChartOption();
+    // 自适应宽高
+    state.chartIns.resize();
+    state.chartIns.setOption(option);
+  })
+}
+
+watch(() => props.data, () => {
+  initChart()
+})
+
+onMounted(() => {
+  // TODO: 真机上滚动会触发resize事件
+  // window.addEventListener('resize', initChart)
+  initChart()
+})
+
+onBeforeUnmount(() => {
+  state.chartIns.dispose();
+  // window.removeEventListener('resize', initChart)
+})
+
+
 </script>

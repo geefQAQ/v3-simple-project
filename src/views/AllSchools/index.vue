@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 导航 -->
-    <van-nav-bar title="全部学校" />
+    <van-nav-bar title="全部学校" safe-area-inset-top />
     <!-- 考勤概况 -->
     <Card>
       <Search
@@ -9,10 +9,9 @@
         @confirm-range="handleConfirmRange"
       />
       <Bar title="今日出勤情况" :data="state.barData" />
-      <!-- <Line title="本周出勤情况" :data="state.lineData" /> -->
+      <Line title="本周出勤情况" :data="state.lineData" />
       <Overview title="统计" :data="state.overviewData" />
     </Card>
-
     <!-- 表格 -->
     <GroupHeader style="padding: 0 10px">
       <van-button
@@ -43,13 +42,14 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref, reactive, nextTick } from 'vue';
+import { reactive } from 'vue';
 import { Toast } from 'vant';
 import {
   getAllDistricts,
   getSchoolsByDistrictId,
   getAttendanceByToday,
 } from '@/api';
+import { scrollToBottom } from '@/utils'
 import { TABLE_COLUMNS, COLORS } from '@/utils/constants';
 import Bar from '@/components/Bar.vue';
 import Line from '@/components/Line.vue';
@@ -111,29 +111,24 @@ getAllDistricts().then(res => {
     state.tabs = res.data;
     state.activeTab = state.tabs[0].id;
     Toast.clear();
-  }, 1000)
+  }, 200)
 });
 
 getAttendanceByToday().then(res => {
+  Toast.loading({
+    duration: 0,
+    message: '加载中...',
+    forbidClick: true,
+  });
   setTimeout(() => {
     state.barData = calcTotal(res);
     state.lineData = {
       xAxisData: ['04/01', '04/02', '04/03'],
       data: [150, 200, 300]
     };
-  }, 500)
+    Toast.clear();
+  }, 1000)
 })
-
-// TODO: utils
-const scrollToBottom = () => {
-  nextTick(() => {
-    const scrollHeight = document.documentElement.scrollHeight; // 总高度
-    window.scrollTo({
-      top: scrollHeight,
-      behavior: 'smooth'
-    })
-  })
-}
 
 const handleTabRendered = () => {
   state.tableLoading[state.activeTab] = true;

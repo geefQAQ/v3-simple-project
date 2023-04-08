@@ -1,8 +1,7 @@
 <template>
   <GroupHeader :title="props.title" />
-  <div style="display: flex">
-    <!-- :style="{width: `${barWidth}px`, height: `${barHeight}px`}" -->
-    <div id="barId" ref="bar" style="height: 200px; width: 50%"></div>
+  <div ref="wrapperEle" style="display: flex">
+    <div ref="barEle" :style="{width: `${state.chartWidth}px`, height: `${state.chartHeight}px`}"></div>
     <div class="legend-wrapper">
       <div class="circle-wrapper" v-for="(legend, index) in props.data" :key="index">
         <div class="legend-circle" :style="{backgroundColor: legend.color}"></div>
@@ -22,10 +21,10 @@ import { TitleComponent } from 'echarts/components';
 import { PieChart } from 'echarts/charts';
 import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
-import { onMounted, onBeforeUnmount, nextTick, ref, watch, toRaw} from 'vue';
+import { onMounted, onBeforeUnmount, nextTick, ref, reactive, computed, watch, shallowRef, toRaw} from 'vue';
 import GroupHeader from '@/components/GroupHeader.vue';
+import { SCREEN_WIDTH } from '@/utils/constants';
 
-// TODO: 封装
 echarts.use([
   TitleComponent,
   PieChart,
@@ -57,7 +56,7 @@ const option = {
   },
   series: [
     {
-      name: 'Access From',
+      name: '今日出勤表',
       type: 'pie',
       center: ['50%', '50%'],
       radius: ['70%', '95%'],
@@ -75,40 +74,29 @@ const option = {
         show: false
       },
       data:[
-        { name: '全部', value: 145 },
-        { name: '请假', value: 123 },
-        { name: '迟到', value: 120 },
-        { name: '缺勤', value: 100 }
+        // { name: '全部', value: 145 },
+        // { name: '请假', value: 123 },
+        // { name: '迟到', value: 120 },
+        // { name: '缺勤', value: 100 }
       ]
     }
   ]
 };
-let myChart = null;
-let chartIns = null;
-let barEle = null;
-const bar = ref(null);
+// const screenWidth = document.documentElement.clientWidth;
+const barEle = ref();
+const wrapperEle = ref();
+const chartIns = shallowRef();
+const state = reactive({
+  barEle,
+  wrapperEle,
+  chartIns,
+  chartWidth: (SCREEN_WIDTH - 24) / 2,
+  chartHeight: computed(() => {
+    return state.chartWidth * 1.2
+  }),
+})
 
-// watch(() => props.data, (val) => {
-//   const value = toRaw(val);
-//   const color = value.filter(item => item.name !== '全部').map(item => item.color);
-//   const data = value.map(item => {
-//     return {
-//       name: item.name,
-//       value: item.value
-//     }
-//   }).filter(item => item.name !== '全部');
-//   option.series[0].data = data;
-//   option.color = color;
-//   option.title.text = `今日出勤率\n80%`;
-//   chartIns && chartIns.clear();
-//   chartIns.setOption(option);
-// })
-
-
-const barWidth = ref(100);
-const barHeight = ref(190);
-
-const changeOption = () => {
+const updateChartOption = () => {
   const value = toRaw(props.data);
   const color = value.filter(item => item.name !== '全部').map(item => item.color);
   const data = value.map(item => {
@@ -123,37 +111,30 @@ const changeOption = () => {
 }
 
 const initChart = () => {
-  // chartIns && chartIns.dispose();
-  barEle = document.getElementById('barId');
-  // const exist  = echarts.getInstanceByDom(bar.value)
-  // if(exist) {
-  //   echarts.dispose(exist);
-  // }
-  // chartIns = chartIns || echarts.init(barEle);
-  chartIns = chartIns || echarts.init(bar.value);
-
-  console.log(`output->barEle`,barEle)
-  console.log(`output->bar.value`,bar.value, barEle === bar.value)
-  // chartIns = chartIns || echarts.init(barEle);
-  chartIns.clear();
-  changeOption();
-  // chartIns.clear();
-  chartIns.setOption(option);
+  state.chartIns && state.chartIns.clear();
+  nextTick(() => {
+    const wrapperWidth = state.wrapperEle.clientWidth;
+    state.chartWidth = wrapperWidth / 2;
+    state.chartIns = state.chartIns || echarts.init(state.barEle);
+    // 自适应宽高
+    state.chartIns.resize();
+    updateChartOption();
+    state.chartIns.setOption(option);
+  })
 }
 
 watch(() => props.data, () => {
-  console.log(`output->watch`)
   initChart()
 })
 
 onMounted(() => {
-  // const chartIns = echarts.getInstanceByDom(barEle)
-  console.log(`output->mounted`)
-  nextTick(() => {
-    initChart()
-    // myChart = echarts.init(barEle);
-    // myChart.setOption(option);
-  })
+  // window.addEventListener('resize', initChart)
+  initChart()
+})
+
+onBeforeUnmount(() => {
+  state.chartIns.dispose();
+  // window.removeEventListener('resize', initChart)
 })
 
 
@@ -168,7 +149,7 @@ onMounted(() => {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background-color: lightcoral;
+  // background-color: lightcoral;
 }
 
 .circle-wrapper {
@@ -177,11 +158,10 @@ onMounted(() => {
   position: relative;
 }
 
-.bar-wrapper {
-  flex: 1;
-  height: 200px;
-  // width: 100%;
-}
+// .bar-wrapper {
+//   flex: 1;
+//   height: 200px;
+// }
 
 .legend-wrapper {
   width: 50%;

@@ -2,9 +2,9 @@
   <div>
     <van-nav-bar
       :title="state.title"
-      left-text="返回"
       left-arrow
       @click-left="onClickLeft"
+      safe-area-inset-top
     />
     <Card>
       <Search
@@ -12,7 +12,7 @@
         @confirm-range="handleConfirmRange"
       />
       <Bar title="今日出勤情况" :data="state.barData" />
-      <!-- <Line title="本周出勤情况" :data="state.lineData" /> -->
+      <Line title="本周出勤情况" :data="state.lineData" />
       <Overview title="统计" :data="state.overviewData" />
     </Card>
     <!-- 表格 -->
@@ -64,7 +64,8 @@ const state = reactive({
     { name: '其他症状', num: 1, numberColor: COLORS.absent},
     { name: '未检测', num: 1, numberColor: COLORS.normal}
   ],
-  tableData: []
+  tableData: [],
+  title: '',
 })
 
 const calcTotal = (res) => {
@@ -91,6 +92,7 @@ const calcTotal = (res) => {
 
 getGradesBySchoolId().then(res => {
   state.tableData = res.data;
+  state.title = route.query.title;
 })
 
 getAttendanceByToday().then(res => {

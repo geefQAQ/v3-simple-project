@@ -42,3 +42,11 @@ nav 放到 app 不用过渡效果
 刷新按钮 全部数据?
 
 use链式优化
+
+全局请求loading https://juejin.cn/post/7008831425357021192
+
+优化封装echart
+
+考虑优化nav
+
+考虑复用页面
