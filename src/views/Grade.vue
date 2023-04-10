@@ -118,7 +118,6 @@ const onClickLeft = () => {
   router.back();
 }
 const handleClickCell = (row) => {
-  console.log(`output->row`,row)
   const { ClassId: classId, ClassName: className } = row;
   router.push({ name: 'class', params: { classId }, query: { title: className } })
 }

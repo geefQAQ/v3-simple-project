@@ -20,14 +20,21 @@ const mockApi = [
     url: '/mock/all-districts',
     timeout: 100,
     method: 'get',
-    response: ({ query }) => {
-      console.log('/mock/all-districts')
+    response: (req, res) => {
       return {
         status : "ok",
         msg: "msg",
         data: allDistricts,
         code: 0,
       }
+      // setTimeout(() => {
+      //   res.send({
+      //     status : "ok",
+      //     msg: "msg",
+      //     data: allDistricts,
+      //     code: 0,
+      //   })
+      // }, 500)
     }
   },
   {
@@ -93,11 +100,10 @@ const mockApi = [
     }
   },
   {
-    url: '/mock/attendance/:dateStr',
+    url: '/mock/attendance',
     timeout: 100,
     method: 'get',
-    response: ({ query }) => {
-      const { dateStr } = query;
+    response: (config) => {
       return {
         status : "ok",
         msg: "msg",

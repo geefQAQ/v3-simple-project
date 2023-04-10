@@ -3,6 +3,9 @@ import { start, close } from '@/utils/nprogress';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  // scrollBehavior() {
+  //   return { top: 0 }
+  // },
   routes: [
     {
       path: '/',
@@ -12,26 +15,25 @@ const router = createRouter({
     {
       path: '/all-schools',
       name: 'allSchools',
-      component: () => import('@views/AllSchools/index.vue')
+      component: () => import('@views/AllSchools/index.vue'),
     },
     {
       path: '/school/:schoolId',
       name: 'school',
-      component: () => import('@views/School.vue')
+      component: () => import('@views/School.vue'),
     },
     {
       path: '/grade/:gradeId',
       name: 'grade',
-      component: () => import('@views/Grade.vue')
+      component: () => import('@views/Grade.vue'),
     },
     {
       path: '/class/:classId',
       name: 'class',
-      component: () => import('@views/Class.vue')
+      component: () => import('@views/Class.vue'),
     }
   ]
 })
-
 router.beforeEach(() => {
   start();
 });

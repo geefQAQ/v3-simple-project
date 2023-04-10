@@ -39,13 +39,6 @@ const emit = defineEmits([
   'click-cell'
 ])
 
-// table
-// const tableLoading = ref(props.loading);
-// watch(() => props.loading, (val) => {
-//   // console.log(`output->val`,val)
-//   tableLoading.value = val
-// })
-
 const handleCellClick = ({ row }) => {
   emit('click-cell', row);
 }

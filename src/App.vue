@@ -15,6 +15,14 @@ onMounted(() => {
       <component :is="Component" :key="route.path" />
     </transition>
   </router-view>
+  <!-- TODO: 前进刷新 后退不刷新 -->
+  <!-- <router-view v-slot="{ Component, route }">
+    <transition name="fade">
+      <keep-alive>
+        <component :is="Component" :key="route.path" />
+      </keep-alive>
+    </transition>
+  </router-view> -->
 </template>
 
 <style lang="scss" scoped>

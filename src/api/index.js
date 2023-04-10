@@ -1,10 +1,10 @@
-import { request } from "@/utils/service"
+import request from "@/utils/service";
 
-export function getAllDistricts() {
+export function getAllDistricts(options) {
   return request({
     url: "/mock/all-districts",
     method: "get"
-  })
+  }, options)
 }
 
 export function getSchoolsByDistrictId(districtId) {
@@ -35,9 +35,9 @@ export function getStudentsByClassId(classId) {
   })
 }
 
-export function getAttendanceByToday(dateStr) {
+export function getAttendanceByToday(options) {
   return request({
-    url: `/mock/attendance/${dateStr}`,
+    url: `/mock/attendance/`,
     method: "get"
-  })
+  }, options)
 }

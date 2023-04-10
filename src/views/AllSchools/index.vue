@@ -43,13 +43,14 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { reactive } from 'vue';
-import { Toast } from 'vant';
 import {
   getAllDistricts,
   getSchoolsByDistrictId,
   getAttendanceByToday,
 } from '@/api';
-import { scrollToBottom } from '@/utils'
+import {
+  scrollToBottom
+} from '@/utils'
 import { TABLE_COLUMNS, COLORS } from '@/utils/constants';
 import Bar from '@/components/Bar.vue';
 import Line from '@/components/Line.vue';
@@ -101,33 +102,17 @@ const calcTotal = (res) => {
   ]
 }
 
-getAllDistricts().then(res => {
-  Toast.loading({
-    duration: 0,
-    message: '加载中...',
-    forbidClick: true,
-  });
-  setTimeout(() => {
-    state.tabs = res.data;
-    state.activeTab = state.tabs[0].id;
-    Toast.clear();
-  }, 200)
+getAllDistricts({loading: true, delay: 150}).then(res => {
+  state.tabs = res.data;
+  state.activeTab = state.tabs[0].id;
 });
 
-getAttendanceByToday().then(res => {
-  Toast.loading({
-    duration: 0,
-    message: '加载中...',
-    forbidClick: true,
-  });
-  setTimeout(() => {
-    state.barData = calcTotal(res);
-    state.lineData = {
-      xAxisData: ['04/01', '04/02', '04/03'],
-      data: [150, 200, 300]
-    };
-    Toast.clear();
-  }, 1000)
+getAttendanceByToday({loading: true, delay: 150}).then(res => {
+  state.barData = calcTotal(res);
+  state.lineData = {
+    xAxisData: ['04/01', '04/02', '04/03'],
+    data: [150, 200, 300]
+  };
 })
 
 const handleTabRendered = () => {
@@ -140,13 +125,17 @@ const handleTabRendered = () => {
       if(state.activeTab !== '0') {
         scrollToBottom()
       }
-    }, 500)
+    }, 200)
   });
 };
 
 const handleClickCell = (row) => {
   const { SchoolName: schoolName, SchoolCode: schoolId } = row;
-  router.push({ name: 'school', params: { schoolId }, query: { title: schoolName } })
+  router.push({
+    name: 'school',
+    params: { schoolId },
+    query: { title: schoolName }
+  })
 }
 const handleConfirmRange = (value) => {
   // TODO: api

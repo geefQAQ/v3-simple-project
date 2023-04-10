@@ -8,18 +8,22 @@
       right-text="返回首页"
       safe-area-inset-top
     />
-  
-    <Search
-      @confirm-date="handleConfirmDate"
-      @confirm-range="handleConfirmRange"
-    >
-      <template v-slot:chart>
-        <Bar :data="barData"/>
-      </template>
-    </Search>
-  
-    <div class="card">
-      <van-collapse v-model="activeNames">
+
+    <Card>
+      <Search
+        @confirm-date="handleConfirmDate"
+        @confirm-range="handleConfirmRange"
+      />
+    </Card>
+    <Card style="padding-top: 0;">
+      <Collapse
+        :data="collapseData"
+
+      />
+    </Card>
+
+    <Card style="padding-top: 0;">
+      <van-collapse v-model="activeNames" :border="false">
         <van-collapse-item
           v-for="(value, key) in state.listType"
           :title="`${CLASS_OBJ[key].chnName} ${value.length} 人`"
@@ -32,12 +36,6 @@
           </template>
           <template #default>
             <van-space wrap size="20">
-              <!-- <van-button
-                v-for="(student, index) in value"
-                :key="index"
-                round plain type="primary">
-                {{ student.StudentName }}
-              </van-button> -->
               <van-tag
                 v-for="(student, index) in value"
                 :key="index"
@@ -51,8 +49,8 @@
           </template>
         </van-collapse-item>
       </van-collapse>
+    </Card>
   
-    </div>
     <van-popup
       v-model:show="showPopup"
       :style="{ height: '50%', width: '80%' }"
@@ -67,9 +65,10 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router';
 import { ref, reactive, computed } from 'vue';
-import Bar from '@/components/Bar.vue';
-import Search from '@/components/Search.vue';
 import { getStudentsByClassId } from '@/api';
+import Search from '@/components/Search.vue';
+import Card from '@/components/Card.vue';
+import Collapse from '@/components/Collapse.vue'
 
 const router = useRouter();
 const route = useRoute();
@@ -125,7 +124,6 @@ state.listType.normalList = computed(() => {
 const init = () => {
   const { classId } = route.params;
   getStudentsByClassId(classId).then(res => {
-    console.log(`output->res`,res)
     state.allStudentList = res.data;
     // setTimeout(() => {
     // }, 500)
@@ -155,7 +153,6 @@ const handleConfirmDate = () => {
 }
 const handleConfirmRange= () => {
 }
-const barData = ref([])
 
 const showPopup = ref(false);
 </script>

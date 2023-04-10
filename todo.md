@@ -43,10 +43,20 @@ nav 放到 app 不用过渡效果
 
 use链式优化
 
-全局请求loading https://juejin.cn/post/7008831425357021192
+全局请求loading https://juejin.cn/post/7008831425357021192 √
 
 优化封装echart
 
 考虑优化nav
 
 考虑复用页面
+
+优化mock 包括生成数据的数量
+
+打包配置
+
+返回滚动
+
+local store 存储sessionId
+
+keep alive 跳转刷新/不刷新 ※

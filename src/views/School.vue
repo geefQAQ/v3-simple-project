@@ -90,19 +90,25 @@ const calcTotal = (res) => {
   ]
 }
 
-getGradesBySchoolId().then(res => {
+getGradesBySchoolId({
+  loading: true,
+  delay: true,
+}).then(res => {
   state.tableData = res.data;
   state.title = route.query.title;
 })
 
-getAttendanceByToday().then(res => {
-  setTimeout(() => {
-    state.barData = calcTotal(res);
-    state.lineData = {
-      xAxisData: ['04/01', '04/02', '04/03'],
-      data: [150, 200, 300]
-    };
-  }, 500)
+getAttendanceByToday({
+  loading: true,
+  delay: true,
+}).then(res => {
+  state.barData = calcTotal(res);
+  state.lineData = {
+    xAxisData: ['04/01', '04/02', '04/03'],
+    data: [150, 200, 300]
+  };
+  // setTimeout(() => {
+  // }, 500)
 })
 
 
