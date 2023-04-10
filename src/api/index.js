@@ -28,11 +28,11 @@ export function getClassesByGradeId(gradeId) {
   })
 }
 
-export function getStudentsByClassId(classId) {
+export function getStudentsByClassId(classId, options) {
   return request({
     url: `/mock/students/${classId}`,
     method: "get"
-  })
+  }, options)
 }
 
 export function getAttendanceByToday(options) {
