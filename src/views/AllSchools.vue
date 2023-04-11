@@ -16,7 +16,7 @@
       <Line title="近七天请假统计" :data="state.holidayByRecent7Days" />
     </Card>
     <!-- 表格 -->
-    <GroupHeader style="padding: 0 10px">
+    <GroupHeader title="学校总览" style="padding: 0 10px">
       <van-button
         icon="replay"
         round size="mini"
@@ -87,7 +87,7 @@ const state = reactive({
   }
 })
 
-const calcTotal = (res) => {
+const calcTotal = (data) => {
   const {
     Late: late,
     Absent: absent,
@@ -95,7 +95,7 @@ const calcTotal = (res) => {
     Actually: actually,
     Total: total,
     Rate: rate,
-  } = res.data
+  } = data
 
   return {
     rate,
@@ -109,17 +109,14 @@ const calcTotal = (res) => {
   }
 }
 
+const requestOption = {loading: true, delay: true};
 const fetchData = (refresh = false) => {
-  getAllDistricts({loading: true, delay: true}).then(res => {
-    state.tabs = res.data;
-    state.activeTab = state.tabs[0].id;
-  });
 
-  getAttendanceByToday({loading: true, delay: true}).then(res => {
-    state.attendanceByToday = calcTotal(res);
+  getAttendanceByToday(requestOption).then(res => {
+    state.attendanceByToday = calcTotal(res?.data);
   })
 
-  getHolidayByToday({loading: true, delay: true}).then(res => {
+  getHolidayByToday(requestOption).then(res => {
     const {
       HolidayTotal: holidayTotal,
       HolidayPrivateAffair: holidayPrivateAffair,
@@ -135,7 +132,7 @@ const fetchData = (refresh = false) => {
   })
 
   // 维度为日时不刷新
-  refresh || getAttendanceByRecent7Days({loading: true, delay: true}).then(res => {
+  refresh || getAttendanceByRecent7Days(requestOption).then(res => {
     const { Recent7Days: xAxisData, Data: data } = res?.data;
     state.attendanceByRecent7Days = {
       xAxisData,
@@ -143,19 +140,24 @@ const fetchData = (refresh = false) => {
     };
   })
 
-  refresh || getHolidayByRecent7Days({loading: true, delay: true}).then(res => {
+  refresh || getHolidayByRecent7Days(requestOption).then(res => {
     const { Recent7Days: xAxisData, Data: data } = res?.data;
     state.holidayByRecent7Days = {
       xAxisData,
       data
     };
   })
+
+  refresh || getAllDistricts(requestOption).then(res => {
+    state.tabs = res.data;
+    state.activeTab = state.tabs[0].id;
+  });
 }
 fetchData();
 
 const handleTabRendered = () => {
   // state.tableLoading[state.activeTab] = true;
-  getSchoolsByDistrictId(state.activeTab).then(res => {
+  getSchoolsByDistrictId(state.activeTab, requestOption).then(res => {
     const { data } = res;
     state.tableData[state.activeTab] = data;
     // state.tableLoading[state.activeTab] = false;
@@ -167,7 +169,17 @@ const handleTabRendered = () => {
 };
 
 const handleRefresh = () => {
-  fetchData(true)
+  fetchData(true);
+  // state.tableLoading[state.activeTab] = true;
+  getSchoolsByDistrictId(state.activeTab, requestOption).then(res => {
+    const { data } = res;
+    state.tableData[state.activeTab] = data;
+    // state.tableLoading[state.activeTab] = false;
+  }).then(() => {
+    if (state.activeTab !== state.tabs[0].id) {
+      scrollToBottom()
+    }
+  });
 }
 
 const handleClickCell = (row) => {

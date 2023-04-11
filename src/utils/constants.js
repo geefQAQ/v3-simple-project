@@ -6,9 +6,9 @@ export const TABLE_COLUMNS = [
 ];
 export const COLORS = {
   holiday: '#5470c6',
-  late: '#91cc75',
-  absent: '#fac858',
-  normal: '#ee6666',
+  late: '#fac858',
+  absent: '#ee6666',
+  normal: '#91cc75',
   all: '#73c0de'
 }
 

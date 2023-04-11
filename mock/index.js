@@ -10,39 +10,23 @@ import {
   attendanceToday,
   attendanceRecent7Days,
   holidayOverview,
-  holidayRecent7Days
+  holidayRecent7Days,
+  allDistricts,
+  schoolsByDistrict,
 } from './api'
-
-const allDistricts = [
-  { id: '0', name: '桂一社区' },
-  { id: '1', name: '桂园社区' },
-  { id: '2', name: '石肯社区' },
-  { id: '3', name: '叠南社区' },
-  { id: '4', name: '怡海社区' },
-  { id: '5', name: '桂雅社区' },
-  { id: '6', name: '叠二社区' },
-]
 
 const mockApi = [
   {
     url: '/mock/all-districts',
     timeout: 100,
     method: 'get',
-    response: (req, res) => {
+    response: () => {
       return {
         status : "ok",
         msg: "msg",
         data: allDistricts,
         code: 0,
       }
-      // setTimeout(() => {
-      //   res.send({
-      //     status : "ok",
-      //     msg: "msg",
-      //     data: allDistricts,
-      //     code: 0,
-      //   })
-      // }, 500)
     }
   },
   {
@@ -60,7 +44,7 @@ const mockApi = [
       return {
         status : "ok",
         msg: "msg",
-        data: resData,
+        data: schoolsByDistrict,
         code: 0,
       }
     }

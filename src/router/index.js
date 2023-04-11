@@ -15,7 +15,7 @@ const router = createRouter({
     {
       path: '/all-schools',
       name: 'allSchools',
-      component: () => import('@views/AllSchools/index.vue'),
+      component: () => import('@views/AllSchools.vue'),
     },
     {
       path: '/school/:schoolId',

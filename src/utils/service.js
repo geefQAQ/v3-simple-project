@@ -5,6 +5,7 @@ import { Toast } from 'vant';
 let loadingCount = 0;
 const startLoading = () => {
   loadingCount++;
+  // console.log(`output->startLoading`,loadingCount)
   if(loadingCount === 1) {
     Toast.loading({
       duration: 0,
@@ -16,6 +17,7 @@ const startLoading = () => {
 
 const endLoading = () => {
   loadingCount--;
+  // console.log(`output->endLoading`,loadingCount)
   if(loadingCount === 0) {
     Toast.clear();
   }
@@ -46,7 +48,7 @@ function createService(axiosConfig, customOptions = Object.assign({
     }
   )
   const { loading, delay } = customOptions
-  console.log(`---------------request----------->${axiosConfig.url.replace(/\/mock/, '')}`, loading)
+  console.log(`---------------request----------->${axiosConfig.url.replace(/\/mock/, '')}`)
   // 请求拦截
   service.interceptors.request.use(
     (config) => config,

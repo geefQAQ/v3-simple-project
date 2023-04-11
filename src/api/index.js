@@ -7,11 +7,11 @@ export function getAllDistricts(options) {
   }, options)
 }
 
-export function getSchoolsByDistrictId(districtId) {
+export function getSchoolsByDistrictId(districtId, options) {
   return request({
     url: `/mock/schools/${districtId}`,
     method: "get"
-  })
+  }, options)
 }
 
 export function getGradesBySchoolId(schoolId) {
