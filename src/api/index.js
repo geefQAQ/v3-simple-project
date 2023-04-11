@@ -41,3 +41,24 @@ export function getAttendanceByToday(options) {
     method: "get"
   }, options)
 }
+
+export function getAttendanceByRecent7Days(options) {
+  return request({
+    url: '/mock/attendanceRecent7Days',
+    method: "get"
+  }, options)
+}
+
+export function getHolidayByToday(options) {
+  return request({
+    url: '/mock/holiday',
+    method: "get"
+  }, options)
+}
+
+export function getHolidayByRecent7Days(options) {
+  return request({
+    url: '/mock/holidayRecent7Days',
+    method: "get"
+  }, options)
+}

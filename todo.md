@@ -57,6 +57,24 @@ use链式优化
 
 返回滚动
 
-local store 存储sessionId
+local store 存储 token
 
 keep alive 跳转刷新/不刷新 ※
+
+刷新token
+
+统计 请假 事假 病假
+
+近七日
+
+请假近七日
+
+刷新表格 查询条件 都只查询当日维度
+
+table loading 删除
+
+toFixed问题
+
+git 仓库关联2个
+
+比率图表+%

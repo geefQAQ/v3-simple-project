@@ -1,9 +1,10 @@
 <template>
-  <GroupHeader :title="props.title" />
+  <GroupHeader :title="title" />
   <div ref="wrapperEle">
     <div ref="lineEle" :style="{width: `${state.chartWidth}px`, height: `${state.chartHeight}px`}"></div>
   </div>
   <van-divider
+    v-if="showDivider"
     dashed
     :style="{ borderColor: '#5470c6', marginBottom: 0 }"
   ></van-divider>
@@ -34,6 +35,10 @@ const props = defineProps({
   data: {
     type: Object,
     default: () => {}
+  },
+  showDivider: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -50,7 +55,7 @@ const option = {
   },
   grid: {
     top:'5%',
-    left:'10%',
+    left:'8%',
     right:'2%',
     bottom:'10%',
   },

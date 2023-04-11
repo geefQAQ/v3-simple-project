@@ -1,15 +1,16 @@
 <template>
-  <GroupHeader :title="props.title" />
+  <GroupHeader :title="title" />
   <div ref="wrapperEle" style="display: flex">
     <div ref="barEle" :style="{width: `${state.chartWidth}px`, height: `${state.chartHeight}px`}"></div>
     <div class="legend-wrapper">
-      <div class="circle-wrapper" v-for="(legend, index) in props.data" :key="index">
+      <div class="circle-wrapper" v-for="(legend, index) in data.data" :key="index">
         <div class="legend-circle" :style="{backgroundColor: legend.color}"></div>
         {{ `${legend.name} : ${legend.value}` }}
       </div>
     </div>
   </div>
   <van-divider
+    v-if="showDivider"
     dashed
     :style="{ borderColor: '#5470c6', marginBottom: 0 }"
   ></van-divider>
@@ -38,8 +39,12 @@ const props = defineProps({
     default: ''
   },
   data: {
-    type: Array,
-    default: () => []
+    type: Object,
+    default: () => {}
+  },
+  showDivider: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -73,12 +78,7 @@ const option = {
       labelLine: {
         show: false
       },
-      data:[
-        // { name: '全部', value: 145 },
-        // { name: '请假', value: 123 },
-        // { name: '迟到', value: 120 },
-        // { name: '缺勤', value: 100 }
-      ]
+      data:[]
     }
   ]
 };
@@ -97,17 +97,17 @@ const state = reactive({
 })
 
 const updateChartOption = () => {
-  const value = toRaw(props.data);
-  const color = value.filter(item => item.name !== '全部').map(item => item.color);
-  const data = value.map(item => {
+  const { rate, data } = toRaw(props.data);
+  const color = data.filter(item => item.name !== '全部').map(item => item.color);
+  const displayData = data.map(item => {
     return {
       name: item.name,
       value: item.value
     }
   }).filter(item => item.name !== '全部');
-  option.series[0].data = data;
+  option.series[0].data = displayData;
   option.color = color;
-  option.title.text = `今日出勤率\n80%`;
+  option.title.text = `今日出勤率\n${rate}`;
 }
 
 const initChart = () => {

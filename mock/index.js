@@ -3,7 +3,15 @@ import data1 from './data1.json';
 import gradeList from './gradeList.json';
 import classList from './classList.json';
 import studentList from './studentList.json';
-import attendanceToday from './attendanceToday.json';
+// import attendanceToday from './attendanceToday.json';
+
+import {
+  gettownaccess,
+  attendanceToday,
+  attendanceRecent7Days,
+  holidayOverview,
+  holidayRecent7Days
+} from './api'
 
 const allDistricts = [
   { id: '0', name: '桂一社区' },
@@ -108,6 +116,45 @@ const mockApi = [
         status : "ok",
         msg: "msg",
         data: attendanceToday,
+        code: 0,
+      }
+    }
+  },
+  {
+    url: '/mock/attendanceRecent7Days',
+    timeout: 100,
+    method: 'get',
+    response: () => {
+      return {
+        status : "ok",
+        msg: "msg",
+        data: attendanceRecent7Days,
+        code: 0,
+      }
+    }
+  },
+  {
+    url: '/mock/holiday',
+    timeout: 100,
+    method: 'get',
+    response: () => {
+      return {
+        status : "ok",
+        msg: "msg",
+        data: holidayOverview,
+        code: 0,
+      }
+    }
+  },
+  {
+    url: '/mock/holidayRecent7Days',
+    timeout: 100,
+    method: 'get',
+    response: () => {
+      return {
+        status : "ok",
+        msg: "msg",
+        data: holidayRecent7Days,
         code: 0,
       }
     }

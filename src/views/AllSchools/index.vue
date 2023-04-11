@@ -8,9 +8,12 @@
         @confirm-date="handleConfirmDate"
         @confirm-range="handleConfirmRange"
       />
-      <Bar title="今日出勤情况" :data="state.barData" />
-      <Line title="本周出勤情况" :data="state.lineData" />
-      <Overview title="统计" :data="state.overviewData" />
+      <Bar title="今日出勤统计" :data="state.attendanceByToday" show-divider />
+      <Line title="近七天出勤率" :data="state.attendanceByRecent7Days" />
+    </Card>
+    <Card>
+      <Overview title="今日请假统计" :data="state.holidayByToday" show-divider />
+      <Line title="近七天请假统计" :data="state.holidayByRecent7Days" />
     </Card>
     <!-- 表格 -->
     <GroupHeader style="padding: 0 10px">
@@ -18,8 +21,8 @@
         icon="replay"
         round size="mini"
         type="primary"
-        @click="handleTabRendered"
-      >刷新表格</van-button>
+        @click="handleRefresh"
+      >刷新</van-button>
     </GroupHeader>
     <van-tabs
       v-model:active="state.activeTab"
@@ -32,9 +35,9 @@
         <BasicTable
           :data="state.tableData[state.activeTab]"
           :columns="TABLE_COLUMNS"
-          :loading="state.tableLoading[state.activeTab]"
           @click-cell="handleClickCell"
-        />
+          />
+          <!-- :loading="state.tableLoading[state.activeTab]" -->
       </van-tab>
     </van-tabs>
   </div>
@@ -47,6 +50,9 @@ import {
   getAllDistricts,
   getSchoolsByDistrictId,
   getAttendanceByToday,
+  getAttendanceByRecent7Days,
+  getHolidayByToday,
+  getHolidayByRecent7Days
 } from '@/api';
 import {
   scrollToBottom
@@ -66,68 +72,103 @@ const state = reactive({
   activeTab: '0',
   tabs: [],
   tableData: {},
-  tableLoading: {},
-  barData: [],
-  lineData: {
+  attendanceByToday: {
+    rate: '-',
+    data: []
+  },
+  attendanceByRecent7Days: {
     xAxisData: [],
     data: []
   },
-  overviewData: [
-    { name: '正常', num: 1174, numberColor: COLORS.holiday},
-    { name: '发烧', num: 1, numberColor: COLORS.late},
-    { name: '其他症状', num: 1, numberColor: COLORS.absent},
-    { name: '未检测', num: 1, numberColor: COLORS.normal}
-  ]
+  holidayByToday: [],
+  holidayByRecent7Days: {
+    xAxisData: [],
+    data: []
+  }
 })
 
 const calcTotal = (res) => {
-  let holidayTotal = 0;
-  let lateTotal = 0;
-  let absentTotal = 0;
-  let accessTotal = 0;
-  let total = 0;
-  res?.data.forEach(item => {
-    holidayTotal += item['Holiday'];
-    lateTotal += item['Late'];
-    accessTotal += item['Absent'];
-    total += item['Total']
-  })
+  const {
+    Late: late,
+    Absent: absent,
+    Holiday: holiday,
+    Actually: actually,
+    Total: total,
+    Rate: rate,
+  } = res.data
 
-  return  [
-    { name: '全部', value: total, color: COLORS.all },
-    { name: '请假', value: holidayTotal, color: COLORS.holiday },
-    { name: '迟到', value: lateTotal, color: COLORS.late },
-    { name: '缺勤', value: absentTotal, color: COLORS.absent} ,
-    { name: '正常', value: accessTotal, color: COLORS.normal },
-  ]
+  return {
+    rate,
+    data: [
+      { name: '全部', value: total, color: COLORS.all },
+      { name: '请假', value: holiday, color: COLORS.holiday },
+      { name: '迟到', value: late, color: COLORS.late },
+      { name: '缺勤', value: absent, color: COLORS.absent },
+      { name: '正常', value: actually, color: COLORS.normal },
+    ]
+  }
 }
 
-getAllDistricts({loading: true, delay: 150}).then(res => {
-  state.tabs = res.data;
-  state.activeTab = state.tabs[0].id;
-});
+const fetchData = (refresh = false) => {
+  getAllDistricts({loading: true, delay: true}).then(res => {
+    state.tabs = res.data;
+    state.activeTab = state.tabs[0].id;
+  });
 
-getAttendanceByToday({loading: true, delay: 150}).then(res => {
-  state.barData = calcTotal(res);
-  state.lineData = {
-    xAxisData: ['04/01', '04/02', '04/03'],
-    data: [150, 200, 300]
-  };
-})
+  getAttendanceByToday({loading: true, delay: true}).then(res => {
+    state.attendanceByToday = calcTotal(res);
+  })
+
+  getHolidayByToday({loading: true, delay: true}).then(res => {
+    const {
+      HolidayTotal: holidayTotal,
+      HolidayPrivateAffair: holidayPrivateAffair,
+      HolidaySick: holidaySick,
+      HolidayOther: holidayOther
+    } = res?.data
+    state.holidayByToday = [
+      { name: '全部', num: holidayTotal, numberColor: COLORS.holiday },
+      { name: '事假', num: holidayPrivateAffair, numberColor: COLORS.late },
+      { name: '病假', num: holidaySick, numberColor: COLORS.absent },
+      { name: '其他', num: holidayOther, numberColor: COLORS.normal }
+    ]
+  })
+
+  // 维度为日时不刷新
+  refresh || getAttendanceByRecent7Days({loading: true, delay: true}).then(res => {
+    const { Recent7Days: xAxisData, Data: data } = res?.data;
+    state.attendanceByRecent7Days = {
+      xAxisData,
+      data
+    };
+  })
+
+  refresh || getHolidayByRecent7Days({loading: true, delay: true}).then(res => {
+    const { Recent7Days: xAxisData, Data: data } = res?.data;
+    state.holidayByRecent7Days = {
+      xAxisData,
+      data
+    };
+  })
+}
+fetchData();
 
 const handleTabRendered = () => {
-  state.tableLoading[state.activeTab] = true;
+  // state.tableLoading[state.activeTab] = true;
   getSchoolsByDistrictId(state.activeTab).then(res => {
-    setTimeout(() => {
-      const { data } = res;
-      state.tableData[state.activeTab] = data;
-      state.tableLoading[state.activeTab] = false;
-      if(state.activeTab !== '0') {
-        scrollToBottom()
-      }
-    }, 200)
+    const { data } = res;
+    state.tableData[state.activeTab] = data;
+    // state.tableLoading[state.activeTab] = false;
+  }).then(() => {
+    if (state.activeTab !== state.tabs[0].id) {
+      scrollToBottom()
+    }
   });
 };
+
+const handleRefresh = () => {
+  fetchData(true)
+}
 
 const handleClickCell = (row) => {
   const { SchoolName: schoolName, SchoolCode: schoolId } = row;
@@ -139,9 +180,11 @@ const handleClickCell = (row) => {
 }
 const handleConfirmRange = (value) => {
   // TODO: api
+  fetchData(true)
 }
 const handleConfirmDate = (value) => {
   // TODO: api
+  fetchData(true)
 }
 </script>
 
