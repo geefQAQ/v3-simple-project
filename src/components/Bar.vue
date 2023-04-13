@@ -22,7 +22,7 @@ import { TitleComponent } from 'echarts/components';
 import { PieChart } from 'echarts/charts';
 import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
-import { onMounted, onBeforeUnmount, nextTick, ref, reactive, computed, watch, shallowRef, toRaw} from 'vue';
+import { onMounted, nextTick, ref, reactive, computed, watch, shallowRef, toRaw} from 'vue';
 import GroupHeader from '@/components/GroupHeader.vue';
 import { SCREEN_WIDTH } from '@/utils/constants';
 
@@ -82,7 +82,6 @@ const option = {
     }
   ]
 };
-// const screenWidth = document.documentElement.clientWidth;
 const barEle = ref();
 const wrapperEle = ref();
 const chartIns = shallowRef();
@@ -128,15 +127,8 @@ watch(() => props.data, () => {
 })
 
 onMounted(() => {
-  // window.addEventListener('resize', initChart)
   initChart()
 })
-
-onBeforeUnmount(() => {
-  state.chartIns.dispose();
-  // window.removeEventListener('resize', initChart)
-})
-
 
 </script>
 
@@ -149,7 +141,6 @@ onBeforeUnmount(() => {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  // background-color: lightcoral;
 }
 
 .circle-wrapper {
@@ -157,11 +148,6 @@ onBeforeUnmount(() => {
   margin-left: 40px;
   position: relative;
 }
-
-// .bar-wrapper {
-//   flex: 1;
-//   height: 200px;
-// }
 
 .legend-wrapper {
   width: 50%;

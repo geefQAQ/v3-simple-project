@@ -59,26 +59,50 @@ use链式优化
 
 local store 存储 token
 
-keep alive 跳转刷新/不刷新 ※
+keep alive 跳转刷新/不刷新 ※ ×
 
 刷新token
 
-统计 请假 事假 病假
+统计 请假 事假 病假 √
 
-近七日
+近七日 √
 
-请假近七日
+请假近七日 √
 
 刷新表格 查询条件 都只查询当日维度
 
-table loading 删除
+table loading 删除 √
 
-toFixed问题
+toFixed问题 ×
 
 git 仓库关联2个
 
-比率图表+%
+比率图表+% √
 
-export 所有 import
+export 所有 import √ import * as
 
 刷新按钮 刷新当前片区学校
+
+区分mock与线上前缀
+
+近七天，横坐标倒序，纵坐标+百分号 √
+
+mock改成1个接口
+
+已点名 图标 √
+
+封装divider
+
+请求参数默认 √
+
+记得调接口
+
+vite mock 配置
+
+env 环境配置
+
+POST 请求
+
+加上login 逻辑和页面 404
+
+useRect

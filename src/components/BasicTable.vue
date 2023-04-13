@@ -1,25 +1,39 @@
 <template>
+  <!-- :loading="loading" -->
   <vxe-table
-    size="small"
+    size="mini"
     stripe
-    :loading="props.loading"
     align="center"
-    :data="props.data"
+    :data="data"
     @cell-click="handleCellClick"
   >
     <vxe-column
-      v-for="(col, index) in props.columns"
+      v-for="(col, index) in simpleColumns"
       :key="index"
       :field="col.field"
       :title="col.title"
       :width="col.width"
     />
+    <vxe-column
+      v-for="(col, index) in customColumns"
+      :key="index"
+      :title="col.title"
+      :width="col.width"
+    >
+    <template v-if="col.field === 'IsCalled'" #default="{ row }">
+      <van-icon
+        size="16"
+        :name="row.IsCalled ? 'success' : 'cross'"
+        :color="row.IsCalled ? COLORS_OBJ.normal : COLORS_OBJ.absent"
+      />
+    </template>
+    </vxe-column>
   </vxe-table>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-
+import { computed } from 'vue';
+import { COLORS_OBJ } from '@/utils/constants';
 const props = defineProps({
   data: {
     type: Array,
@@ -29,11 +43,17 @@ const props = defineProps({
     type: Array,
     default: [],
   },
-  loading: {
-    type: Boolean,
-    default: false
-  }
+  // loading: {
+  //   type: Boolean,
+  //   default: false
+  // }
 });
+const simpleColumns = computed(() => {
+  return props.columns.filter(i => !i.custom);
+})
+const customColumns = computed(() => {
+  return props.columns.filter(i => i.custom);
+})
 
 const emit = defineEmits([
   'click-cell'

@@ -20,6 +20,7 @@ import {
   Tag,
   Space,
   Divider,
+  Form,
 } from 'vant';
 import 'vant/es/toast/style';
 import 'vant/lib/index.css';
@@ -46,6 +47,7 @@ const components = [
   Tag,
   Space,
   Divider,
+  Form,
 ]
 const vant = {
   install(app) {

@@ -1,23 +1,24 @@
 <template>
   <div>
     <van-nav-bar
-      :title="title"
+      :title="state.title"
       left-arrow
       @click-left="onClickLeft"
       @click-right="onClickRight"
       right-text="返回首页"
       safe-area-inset-top
     />
-    <Card>
+    <Card style="padding-bottom: 0">
       <Search
         @confirm-date="handleConfirmDate"
         @confirm-range="handleConfirmRange"
       />
     </Card>
-    <Card style="padding-top: 0;">
+    <Card style="padding-top: 0; padding-bottom: 0">
       <Collapse
-        v-model="activeCollapse"
+        v-model="state.activeCollapse"
         :data="state.collapseData"
+        :belong="state.belong"
       />
     </Card>
   </div>
@@ -25,7 +26,7 @@
 
 <script setup>
 import { useRouter, useRoute } from 'vue-router';
-import { ref, reactive, computed } from 'vue';
+import { reactive } from 'vue';
 import { getStudentsByClassId } from '@/api';
 import Search from '@/components/Search.vue';
 import Card from '@/components/Card.vue';
@@ -34,41 +35,35 @@ import Collapse from '@/components/Collapse.vue'
 const router = useRouter();
 const route = useRoute();
 
-const activeCollapse = ref(['holiday']);
-
-
-// const collapseData = []
-// const allStudents = ref([]);
 const state = reactive({
-  allStudents: [],
+  title: '',
+  activeCollapse: ['normal', 'late', 'holiday', 'absent'],
+  belong: '',
   collapseData: {
-    absent: [],
-    holiday: [],
-    late: [],
     normal: [],
+    late: [],
+    holiday: [],
+    absent: [],
   }
 })
 
-// 一个for循环 + watch 是不是效率更高？
-state.collapseData.absent = computed(() => {
-  return state.allStudents.filter(i => i.IsAbsent === '1');
-})
-state.collapseData.holiday = computed(() => {
-  return state.allStudents.filter(i => i.IsHoliday === '1');
-})
-state.collapseData.late = computed(() => {
-  return state.allStudents.filter(i => i.IsLate === '1');
-})
-state.collapseData.normal = computed(() => {
-  return state.allStudents.filter(i => i.IsNormal === '1');
-})
+state.title = route.query.title;
 
 // const { classId } = route.params;
 getStudentsByClassId(route?.params?.classId, {loading: true, delay: true}).then(res => {
-  state.allStudents = res.data;
+  // state.allStudents = res.data;
+  console.log(`output->res`,res)
+
+  const { List: studentList, ClassName: className, GradeName: gradeName } = res.data;
+  state.collapseData.normal = studentList.filter(i => i.IsNormal);
+  state.collapseData.late = studentList.filter(i => i.IsLate);
+  state.collapseData.holiday = studentList.filter(i => i.IsHoliday);
+  state.collapseData.absent = studentList.filter(i => i.IsAbsent);
+  state.belong = `${gradeName} ${className}`;
+  console.log(`output->belong1`,state.belong)
 })
 
-const { title } = route.query ?? '';
+
 const onClickLeft = () => {
   router.back();
 }

@@ -2,6 +2,8 @@ import axios from "axios"
 import { get } from "lodash-es";
 import { Toast } from 'vant';
 
+const token = localStorage.getItem('token') ?? '';
+
 let loadingCount = 0;
 const startLoading = () => {
   loadingCount++;
@@ -26,8 +28,8 @@ const endLoading = () => {
 
 /** 创建请求实例 */
 function createService(axiosConfig, customOptions = Object.assign({
-  loading: false,
-  delay: false
+  loading: true,
+  delay: true
 })) {
   // 创建一个 Axios 实例
   const service = axios.create(
@@ -39,7 +41,7 @@ function createService(axiosConfig, customOptions = Object.assign({
     {
       headers: {
         // 携带 Token
-        // Authorization: "Bearer " + getToken(),
+        Authorization: "Bearer " + token,
         "Content-Type": get(axiosConfig, "headers.Content-Type", "application/json")
       },
       timeout: 5000,
@@ -97,7 +99,10 @@ const handleHttpErrorStatus = (error) => {
     case 400: error.message = "请求错误"; break;
     // Token 过期时，直接退出登录并强制刷新页面（会重定向到登录页）
     // location.reload()
-    case 401: error.message = "401"; break;
+    case 401:
+      // 登录后2小时有效，失效后非匿名接口返回401，可带token调用刷新token接口刷新获取新token
+      // error.message = "401";
+      break;
     case 403: error.message = "拒绝访问"; break;
     case 404: error.message = "请求地址出错"; break;
     case 408: error.message = "请求超时"; break;

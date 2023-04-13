@@ -11,22 +11,26 @@
         @confirm-date="handleConfirmDate"
         @confirm-range="handleConfirmRange"
       />
-      <Bar title="今日出勤情况" :data="state.barData" />
-      <Line title="本周出勤情况" :data="state.lineData" />
-      <Overview title="统计" :data="state.overviewData" />
+      <Bar title="今日出勤统计" :data="state.attendanceByToday" show-divider />
+      <Line title="近七天出勤率" :data="state.attendanceByRecent7Days" />
+    </Card>
+
+    <Card>
+      <Overview title="今日请假统计" :data="state.holidayByToday" show-divider />
+      <Line title="近七天请假统计" :data="state.holidayByRecent7Days" />
     </Card>
     <!-- 表格 -->
-    <GroupHeader style="padding: 0 10px">
+    <GroupHeader title="年级统计" style="padding: 0 10px">
       <van-button
         icon="replay"
         round size="mini"
         type="primary"
         @click="handleRefreshTable"
-      >刷新数据</van-button>
+      >刷新</van-button>
     </GroupHeader>
     <BasicTable
       :data="state.tableData"
-      :columns="TABLE_COLUMNS"
+      :columns="GRADE_TABLE_COLUMNS"
       :loading="state.tableLoading"
       @click-cell="handleClickCell"
     />
@@ -38,9 +42,12 @@ import { useRouter, useRoute } from 'vue-router';
 import { ref, reactive } from 'vue';
 import {
   getGradesBySchoolId,
+  getHolidayByToday,
   getAttendanceByToday,
+  getAttendanceByRecent7Days,
+  getHolidayByRecent7Days
 } from '@/api';
-import { TABLE_COLUMNS, COLORS } from '@/utils/constants'
+import { GRADE_TABLE_COLUMNS, COLORS_OBJ } from '@/utils/constants'
 import Card from '@/components/Card.vue';
 import Bar from '@/components/Bar.vue';
 import Line from '@/components/Line.vue';
@@ -53,64 +60,89 @@ const router = useRouter();
 const route = useRoute();
 
 const state = reactive({
-  barData: [],
-  lineData: {
+  title: '',
+  attendanceByToday: {
+    rate: '-',
+    data: []
+  },
+  attendanceByRecent7Days: {
     xAxisData: [],
     data: []
   },
-  overviewData: [
-    { name: '正常', num: 1174, numberColor: COLORS.holiday},
-    { name: '发烧', num: 1, numberColor: COLORS.late},
-    { name: '其他症状', num: 1, numberColor: COLORS.absent},
-    { name: '未检测', num: 1, numberColor: COLORS.normal}
-  ],
+  holidayByToday: [],
+  holidayByRecent7Days: {
+    xAxisData: [],
+    data: []
+  },
   tableData: [],
-  title: '',
-})
+});
 
-const calcTotal = (res) => {
-  let holidayTotal = 0;
-  let lateTotal = 0;
-  let absentTotal = 0;
-  let accessTotal = 0;
-  let total = 0;
-  res?.data.forEach(item => {
-    holidayTotal += item['Holiday'];
-    lateTotal += item['Late'];
-    accessTotal += item['Absent'];
-    total += item['Total']
-  })
+state.title = route?.query?.title;
 
-  return  [
-    { name: '全部', value: total, color: COLORS.all },
-    { name: '请假', value: holidayTotal, color: COLORS.holiday },
-    { name: '迟到', value: lateTotal, color: COLORS.late },
-    { name: '缺勤', value: absentTotal, color: COLORS.absent} ,
-    { name: '正常', value: accessTotal, color: COLORS.normal },
-  ]
+const calcTotal = (data) => {
+  const {
+    Late: late,
+    Absent: absent,
+    Holiday: holiday,
+    Actually: actually,
+    Total: total,
+    Rate: rate,
+  } = data
+
+  return {
+    rate,
+    data: [
+      { name: '全部', value: total, color: COLORS_OBJ.all },
+      { name: '请假', value: holiday, color: COLORS_OBJ.holiday },
+      { name: '迟到', value: late, color: COLORS_OBJ.late },
+      { name: '缺勤', value: absent, color: COLORS_OBJ.absent },
+      { name: '正常', value: actually, color: COLORS_OBJ.normal },
+    ]
+  }
 }
 
-getGradesBySchoolId({
-  loading: true,
-  delay: true,
-}).then(res => {
-  state.tableData = res.data;
-  state.title = route.query.title;
+const requestOption = {loading: true, delay: true}
+
+getAttendanceByToday(requestOption).then(res => {
+    state.attendanceByToday = calcTotal(res?.data);
+  })
+
+getHolidayByToday(requestOption).then(res => {
+  const {
+    HolidayTotal: holidayTotal,
+    HolidayPrivateAffair: holidayPrivateAffair,
+    HolidaySick: holidaySick,
+    HolidayOther: holidayOther
+  } = res?.data
+  state.holidayByToday = [
+    { name: '全部', num: holidayTotal, numberColor: COLORS_OBJ.holiday },
+    { name: '事假', num: holidayPrivateAffair, numberColor: COLORS_OBJ.late },
+    { name: '病假', num: holidaySick, numberColor: COLORS_OBJ.absent },
+    { name: '其他', num: holidayOther, numberColor: COLORS_OBJ.normal }
+  ]
 })
 
-getAttendanceByToday({
-  loading: true,
-  delay: true,
-}).then(res => {
-  state.barData = calcTotal(res);
-  state.lineData = {
-    xAxisData: ['04/01', '04/02', '04/03'],
-    data: [150, 200, 300]
+getAttendanceByRecent7Days(requestOption).then(res => {
+  const { Recent7Days: xAxisData, Data: data } = res?.data;
+  state.attendanceByRecent7Days = {
+    xAxisData,
+    data
   };
-  // setTimeout(() => {
-  // }, 500)
 })
 
+getHolidayByRecent7Days(requestOption).then(res => {
+  const { Recent7Days: xAxisData, Data: data } = res?.data;
+  state.holidayByRecent7Days = {
+    xAxisData,
+    data
+  };
+})
+
+getGradesBySchoolId(requestOption).then(res => {
+  console.log(`output->res`,res)
+  const { List: list } = res?.data;
+  state.tableData = list;
+})
 
 const onClickLeft = () => {
   router.back();

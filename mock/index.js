@@ -1,19 +1,4 @@
-import data from './data.json';
-import data1 from './data1.json';
-import gradeList from './gradeList.json';
-import classList from './classList.json';
-import studentList from './studentList.json';
-// import attendanceToday from './attendanceToday.json';
-
-import {
-  gettownaccess,
-  attendanceToday,
-  attendanceRecent7Days,
-  holidayOverview,
-  holidayRecent7Days,
-  allDistricts,
-  schoolsByDistrict,
-} from './api'
+import * as API from './api'
 
 const mockApi = [
   {
@@ -23,8 +8,8 @@ const mockApi = [
     response: () => {
       return {
         status : "ok",
-        msg: "msg",
-        data: allDistricts,
+        msg: "成功",
+        data: API.allDistricts,
         code: 0,
       }
     }
@@ -35,16 +20,10 @@ const mockApi = [
     method: 'get',
     response: ({ query }) => {
       const { districtId } = query;
-      let resData;
-      if ( Number(districtId) % 2 === 0 ) {
-        resData = data
-      } else {
-        resData = data1
-      }
       return {
         status : "ok",
-        msg: "msg",
-        data: schoolsByDistrict,
+        msg: "成功",
+        data: API.schoolsByDistrict,
         code: 0,
       }
     }
@@ -57,8 +36,8 @@ const mockApi = [
       const { schoolId } = query;
       return {
         status : "ok",
-        msg: "msg",
-        data: gradeList,
+        msg: "成功",
+        data: API.getGradesBySchoolCode,
         code: 0,
       }
     }
@@ -71,8 +50,8 @@ const mockApi = [
       const { gradeId } = query;
       return {
         status : "ok",
-        msg: "msg",
-        data: classList,
+        msg: "成功",
+        data: API.getClassesByGradeId,
         code: 0,
       }
     }
@@ -86,7 +65,7 @@ const mockApi = [
       return {
         status : "ok",
         msg: "msg",
-        data: studentList,
+        data: API.getStudentsByClassId,
         code: 0,
       }
     }
@@ -99,7 +78,7 @@ const mockApi = [
       return {
         status : "ok",
         msg: "msg",
-        data: attendanceToday,
+        data: API.attendanceToday,
         code: 0,
       }
     }
@@ -111,8 +90,8 @@ const mockApi = [
     response: () => {
       return {
         status : "ok",
-        msg: "msg",
-        data: attendanceRecent7Days,
+        msg: "成功",
+        data: API.attendanceRecent7Days,
         code: 0,
       }
     }
@@ -124,8 +103,8 @@ const mockApi = [
     response: () => {
       return {
         status : "ok",
-        msg: "msg",
-        data: holidayOverview,
+        msg: "成功",
+        data: API.holidayOverview,
         code: 0,
       }
     }
@@ -138,7 +117,7 @@ const mockApi = [
       return {
         status : "ok",
         msg: "msg",
-        data: holidayRecent7Days,
+        data: API.holidayRecent7Days,
         code: 0,
       }
     }

@@ -16,7 +16,7 @@ import { GridComponent } from 'echarts/components';
 import { LineChart } from 'echarts/charts';
 import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
-import { onMounted, onBeforeUnmount, reactive, shallowRef,computed, watch, ref, toRaw, nextTick } from 'vue';
+import { onMounted, reactive, shallowRef,computed, watch, ref, toRaw, nextTick } from 'vue';
 import GroupHeader from '@/components/GroupHeader.vue';
 import { SCREEN_WIDTH } from '@/utils/constants';
 
@@ -40,7 +40,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   }
-})
+});
 
 const option = {
   xAxis: {
@@ -51,10 +51,11 @@ const option = {
     data: []
   },
   yAxis: {
-    type: 'value'
+    type: 'value',
+    show: true,
   },
   grid: {
-    top:'5%',
+    top:'15%',
     left:'8%',
     right:'2%',
     bottom:'10%',
@@ -80,12 +81,20 @@ const state = reactive({
   wrapperEle,
   chartIns,
   chartWidth: SCREEN_WIDTH - 24,
-  chartHeight: computed(() => state.chartWidth * 0.6)
+  chartHeight: computed(() => state.chartWidth * 0.7)
 })
 
 const updateChartOption = () => {
-  const { xAxisData, data } = toRaw(props.data);
+  const { xAxisData, data, yAxisData } = toRaw(props.data);
   option.xAxis.data = xAxisData;
+  const unit = yAxisData?.unit;
+  if(unit) {
+    option.yAxis.name = `单位(${unit})`;
+    option.yAxis.nameTextStyle = {
+      nameLocation: "start",
+      padding: [4, 0, 4, 0]
+    }
+  }
   option.series[0].data = data;
 }
 
@@ -103,18 +112,10 @@ const initChart = () => {
 
 watch(() => props.data, () => {
   initChart()
-})
+}, { deep: true })
 
 onMounted(() => {
-  // TODO: 真机上滚动会触发resize事件
-  // window.addEventListener('resize', initChart)
   initChart()
 })
-
-onBeforeUnmount(() => {
-  state.chartIns.dispose();
-  // window.removeEventListener('resize', initChart)
-})
-
 
 </script>
