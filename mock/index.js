@@ -1,4 +1,4 @@
-import * as API from './api'
+import * as API from './api';
 
 const mockApi = [
   {
@@ -170,8 +170,8 @@ const mockApi = [
     }
   },
   {
-    url: '/mock/noToken',
-    method: 'post',
+    url: '/mock/401',
+    method: 'get',
     statusCode: 401,
     response: () => {
       return {

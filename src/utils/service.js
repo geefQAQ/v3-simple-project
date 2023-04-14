@@ -2,9 +2,10 @@ import axios from "axios"
 import { get } from "lodash-es";
 import { Toast } from 'vant';
 import { postRefreshToken } from '@/api';
-import { setLocalStorage } from './storage';
+import { setLocalStorage, getLocalStorage } from './storage';
+import router from '../router';
 
-const token = localStorage.getItem('token');
+const token = getLocalStorage('token');
 
 let loadingCount = 0;
 const startLoading = () => {
@@ -32,7 +33,7 @@ function createService(axiosConfig, customOptions) {
   const custom_opt = Object.assign({
     loading: true,
     delay: true,
-    withToken: true
+    needToken: true
   }, customOptions)
   // 创建一个 Axios 实例
   const service = axios.create(
@@ -44,31 +45,44 @@ function createService(axiosConfig, customOptions) {
     {
       headers: {
         // 携带 Token
-        "Content-Type": get(axiosConfig, "headers.Content-Type", "application/json")
+        "content-Type": get(axiosConfig, "headers.content-Type", "application/json")
       },
       timeout: 5000,
       // baseURL: import.meta.env.VITE_BASE_API,
       data: {}
     }
     )
-    const { loading, delay, withToken } = custom_opt
-    if(withToken) {
-      axios.defaults.headers['authorization'] = `Bearer ${token}`;
+    const { loading, delay, needToken } = custom_opt;
+    if(token && needToken) {
+      axios.defaults.headers['authorization'] = token ? `Bearer ${token}` : null;
     }
     console.log(
-      `---------------request----------->${axiosConfig.url.replace(/\/mock/, '')}`,
-      axios.defaults.headers.authorization, axiosConfig)
+        `---------------request----------->${axiosConfig.url.replace(/\/mock/, '')}`)
+    // console.log(
+    //   `---------------request----------->${axiosConfig.url.replace(/\/mock/, '')}`,
+    //   axios.defaults.headers.authorization, axiosConfig)
   // 请求拦截
+  const isDev = true;
+
   service.interceptors.request.use(
-    (config) => config,
+    (config) => {
+      // TODO: 开发模式下才开启
+      if(isDev) {
+        // 如果需要带token，但是没有，会直接返回401
+        if(needToken && !token) {
+          console.log(`output->needToken`, needToken, token)
+          config.url = '/mock/401'
+        }
+      }
+      console.log(`output->request`,config)
+      return config
+    },
     // 发送失败
     (error) => Promise.reject(error)
   )
   // 响应拦截（可根据具体业务作出相应的调整）
   service.interceptors.response.use(
     (response) => {
-      // const status = get(error, "response.status");
-      console.log(`output->response`,response)
 
       loading && startLoading();
       // apiData 是 API 返回的数据
@@ -107,12 +121,17 @@ const handleHttpErrorStatus = (error) => {
     case 400: error.message = "请求错误"; break;
     case 401:
       // token失效后非匿名接口返回401，可带token调用刷新token接口刷新获取新token
-      postRefreshToken({ token }, { loading: false, delay: false }).then(res => {
-        const { token } = res?.data;
-        setLocalStorage('token', token);
-      })
-      // 当前页面重新加载
-      location.reload();
+      if(token) {
+
+        postRefreshToken({ token }, { loading: false, delay: false }).then(res => {
+          const { token } = res?.data;
+          setLocalStorage('token', token);
+        })
+        // 当前页面重新加载
+        location.reload();
+      } else {
+        router.replace({name: 'login'})
+      }
       break;
     case 403: error.message = "拒绝访问"; break;
     case 404: error.message = "请求地址出错"; break;

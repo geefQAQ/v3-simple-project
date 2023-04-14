@@ -89,7 +89,7 @@ export function postRefreshToken(data, options) {
 
 export function noToken(options) {
   return request({
-    url: '/mock/noToken',
+    url: '/mock/401',
     method: 'post',
     data: null
   }, options)

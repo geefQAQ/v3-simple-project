@@ -1,4 +1,8 @@
 export const setLocalStorage = (key, value) => {
+  // return new Promise((resolve) => {
+  //   localStorage.setItem(key, value);
+  //   resolve();
+  // })
   return localStorage.setItem(key, value);
 }
 

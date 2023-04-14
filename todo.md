@@ -101,10 +101,14 @@ vite mock 配置
 
 env 环境配置
 
-POST 请求
+POST 请求 √
 
 加上login 逻辑和页面 404
 
 useRect
 
 自适应字体大小
+
+localstorage promisify
+
+用 pinia 处理 storage 的读取？ 感觉本地读的时候有问题
