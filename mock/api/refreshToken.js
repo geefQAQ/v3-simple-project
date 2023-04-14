@@ -3,17 +3,17 @@ const token = 'newToken';
 // TODO: 本地存储token
 
 
-const setToken = () => {
+const setLocalStorage = () => {
   return localStorage.setItem('token', token);
 }
 
-const getToken = () => {
+const getLocalStorage = () => {
   return localStorage.getItem('token', token);
 }
 
 
 
 export default {
-  setToken,
-  getToken
+  setLocalStorage,
+  getLocalStorage
 };

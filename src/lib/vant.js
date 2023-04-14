@@ -21,6 +21,8 @@ import {
   Space,
   Divider,
   Form,
+  Popover,
+  ConfigProvider
 } from 'vant';
 import 'vant/es/toast/style';
 import 'vant/lib/index.css';
@@ -48,6 +50,8 @@ const components = [
   Space,
   Divider,
   Form,
+  Popover,
+  ConfigProvider
 ]
 const vant = {
   install(app) {

@@ -1,9 +1,11 @@
-// TODO: 本地存储token
-
-export const setToken = (token) => {
-  return localStorage.setItem('token', token);
+export const setLocalStorage = (key, value) => {
+  return localStorage.setItem(key, value);
 }
 
-export const getToken = () => {
-  return localStorage.getItem('token');
+export const getLocalStorage = (key) => {
+  return localStorage.getItem(key);
+}
+
+export const clearLocalStorage = (key) => {
+  return localStorage.removeItem(key);
 }

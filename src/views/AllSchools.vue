@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 导航 -->
-    <van-nav-bar title="全部学校" safe-area-inset-top />
+    <NavBar title="全部学校" :actions="navbarActions"/>
     <!-- 考勤概况 -->
     <Card>
       <Search
@@ -39,25 +39,28 @@
           />
       </van-tab>
     </van-tabs>
+    <van-button @click="handleLogout">401</van-button>
   </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { reactive } from 'vue';
+import { ref, reactive } from 'vue';
 import {
   getAllDistricts,
   getSchoolsByDistrictId,
   getAttendanceByToday,
   getAttendanceByRecent7Days,
   getHolidayByToday,
-  getHolidayByRecent7Days
+  getHolidayByRecent7Days,
+  noToken
 } from '@/api';
 import {
   scrollToBottom
 } from '@/utils'
 import { SCHOOL_TABLE_COLUMNS, COLORS_OBJ } from '@/utils/constants';
-import { getToken, setToken } from '@/utils/storage'
+import { getLocalStorage, setLocalStorage } from '@/utils/storage'
+import NavBar from '@/components/NavBar.vue';
 import Bar from '@/components/Bar.vue';
 import Line from '@/components/Line.vue';
 import Search from '@/components/Search.vue';
@@ -65,11 +68,44 @@ import BasicTable from '@/components/BasicTable.vue';
 import GroupHeader from '@/components/GroupHeader.vue';
 import Card from '@/components/Card.vue';
 import Overview from '@/components/Overview.vue';
-
-const token = getToken('token')
-console.log(`output->token`,token)
+import { clearLocalStorage } from '../utils/storage';
 
 const router = useRouter();
+const token = getLocalStorage('token');
+
+const showPopover = ref(false);
+
+// 通过 actions 属性来定义菜单选项
+
+const navbarActions = [
+  { text: '注销登录', value: 'logout',},
+  // { text: '返回首页', value: 'home', },
+];
+const actions = [
+  { text: '注销登录', value: 'logout',
+    cb: () => {
+      clearLocalStorage('token');
+      router.replace({name: 'login'})
+    }
+  }, { text: '返回首页', value: 'home',
+    cb: () => { router.replace({name: 'home' })}
+  },
+];
+
+const onSelect = (action) => {
+  action.cb()
+  // switch(action.value) {
+  //   case 'logout':
+  //     clearLocalStorage('token');
+  //     router.replace({name: 'login'})
+  //     break;
+  //   case 'home':
+  //     router.replace({name: 'home'})
+  //     break;
+  //   default:
+  //     break;
+  // }
+}
 
 const state = reactive({
   activeTab: '0',
@@ -191,6 +227,21 @@ const handleConfirmRange = (value) => {
 const handleConfirmDate = (value) => {
   // TODO: api
   fetchData()
+}
+
+const handleLogout = () => {
+  noToken();
+}
+
+const handleClickRight = () => {
+
+}
+
+const themeVars = {
+  // popoverActionWidth: 'auto'
+  popoverActionWidth: '100px',
+  popoverArrowSize: '10px',
+  popoverActionHeight: '50px'
 }
 </script>
 

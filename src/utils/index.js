@@ -17,3 +17,5 @@ export const scrollToTop = () => {
     })
   })
 }
+
+export const phoneNumberReg = /^1(3|4|5|6|7|8|9)\d{9}$/

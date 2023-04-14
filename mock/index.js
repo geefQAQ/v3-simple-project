@@ -116,11 +116,70 @@ const mockApi = [
     response: () => {
       return {
         status : "ok",
-        msg: "msg",
+        msg: "成功",
         data: API.holidayRecent7Days,
         code: 0,
       }
     }
-  }
+  },
+  {
+    url: '/mock/sendCode',
+    timeout: 100,
+    method: 'post',
+    response: ({ body }) => {
+      const { mobile } = body
+      console.log(`output->mobile`, mobile)
+      return {
+        status : "ok",
+        msg: "成功",
+        data: null,
+        code: 0,
+      }
+    }
+  },
+  {
+    url: '/mock/login',
+    timeout: 100,
+    method: 'post',
+    response: ({ body }) => {
+      const { mobile, code } = body
+      return {
+        status : "ok",
+        msg: "成功",
+        data: {
+          token: 'loginToken'
+        },
+        code: 0,
+      }
+    }
+  },
+  {
+    url: '/mock/refreshToken',
+    timeout: 100,
+    method: 'post',
+    response: ({ body }) => {
+      const { token } = body
+      return {
+        status : "ok",
+        msg: "成功",
+        data: {
+          token: 'refreshToken'
+        },
+        code: 0,
+      }
+    }
+  },
+  {
+    url: '/mock/noToken',
+    method: 'post',
+    statusCode: 401,
+    response: () => {
+      return {
+        status : "error",
+        msg: "没有token",
+        data: null
+      }
+    },
+  },
 ]
 export default mockApi;

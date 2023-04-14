@@ -1,8 +1,10 @@
 import axios from "axios"
 import { get } from "lodash-es";
 import { Toast } from 'vant';
+import { postRefreshToken } from '@/api';
+import { setLocalStorage } from './storage';
 
-const token = localStorage.getItem('token') ?? '';
+const token = localStorage.getItem('token');
 
 let loadingCount = 0;
 const startLoading = () => {
@@ -25,12 +27,13 @@ const endLoading = () => {
   }
 }
 
-
 /** 创建请求实例 */
-function createService(axiosConfig, customOptions = Object.assign({
-  loading: true,
-  delay: true
-})) {
+function createService(axiosConfig, customOptions) {
+  const custom_opt = Object.assign({
+    loading: true,
+    delay: true,
+    withToken: true
+  }, customOptions)
   // 创建一个 Axios 实例
   const service = axios.create(
     // vite-plugin-mock 不支持自定义端口？
@@ -41,16 +44,20 @@ function createService(axiosConfig, customOptions = Object.assign({
     {
       headers: {
         // 携带 Token
-        Authorization: "Bearer " + token,
         "Content-Type": get(axiosConfig, "headers.Content-Type", "application/json")
       },
       timeout: 5000,
       // baseURL: import.meta.env.VITE_BASE_API,
       data: {}
     }
-  )
-  const { loading, delay } = customOptions
-  console.log(`---------------request----------->${axiosConfig.url.replace(/\/mock/, '')}`)
+    )
+    const { loading, delay, withToken } = custom_opt
+    if(withToken) {
+      axios.defaults.headers['authorization'] = `Bearer ${token}`;
+    }
+    console.log(
+      `---------------request----------->${axiosConfig.url.replace(/\/mock/, '')}`,
+      axios.defaults.headers.authorization, axiosConfig)
   // 请求拦截
   service.interceptors.request.use(
     (config) => config,
@@ -60,6 +67,8 @@ function createService(axiosConfig, customOptions = Object.assign({
   // 响应拦截（可根据具体业务作出相应的调整）
   service.interceptors.response.use(
     (response) => {
+      // const status = get(error, "response.status");
+      console.log(`output->response`,response)
 
       loading && startLoading();
       // apiData 是 API 返回的数据
@@ -93,15 +102,17 @@ function createService(axiosConfig, customOptions = Object.assign({
   )
   return service(axiosConfig)
 }
-
 const handleHttpErrorStatus = (error) => {
   switch (error) {
     case 400: error.message = "请求错误"; break;
-    // Token 过期时，直接退出登录并强制刷新页面（会重定向到登录页）
-    // location.reload()
     case 401:
-      // 登录后2小时有效，失效后非匿名接口返回401，可带token调用刷新token接口刷新获取新token
-      // error.message = "401";
+      // token失效后非匿名接口返回401，可带token调用刷新token接口刷新获取新token
+      postRefreshToken({ token }, { loading: false, delay: false }).then(res => {
+        const { token } = res?.data;
+        setLocalStorage('token', token);
+      })
+      // 当前页面重新加载
+      location.reload();
       break;
     case 403: error.message = "拒绝访问"; break;
     case 404: error.message = "请求地址出错"; break;
@@ -114,7 +125,7 @@ const handleHttpErrorStatus = (error) => {
     case 505: error.message = "HTTP 版本不受支持"; break;
     default: break;
   }
-  Toast.fail(error.message);
+  error?.message && Toast.fail(error.message);
 }
 
 export default createService;

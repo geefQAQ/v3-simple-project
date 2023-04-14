@@ -4,6 +4,8 @@
   --van-warning-color: #fc8452;
   --van-danger-color: #ee6666;
   --van-success-color: #91cc75;
+
+  --van-popover-action-width: auto;
 }
 
 *,
